@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inquiries — PIPE CHEM Admin</title>
+  <link rel="icon" href="../assets/images/logo.png" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="sidebar-logo"><img src="../assets/images/logo.png" alt="PIPE CHEM"><span>Admin Panel</span></div>
+    <nav class="sidebar-nav">
+      <p class="sidebar-section-label">Overview</p>
+      <a href="dashboard.html" class="sidebar-link"><span class="s-icon">&#128200;</span> Dashboard</a>
+      <p class="sidebar-section-label">Management</p>
+      <a href="users.html" class="sidebar-link"><span class="s-icon">&#128101;</span> User Management</a>
+      <a href="inquiries.html" class="sidebar-link active"><span class="s-icon">&#128203;</span> Inquiries</a>
+      <a href="appointments.html" class="sidebar-link"><span class="s-icon">&#128197;</span> Appointments</a>
+      <a href="reports.html" class="sidebar-link"><span class="s-icon">&#128220;</span> Reports</a>
+      <p class="sidebar-section-label">Website</p>
+      <a href="../index.html" class="sidebar-link" target="_blank"><span class="s-icon">&#127760;</span> View Website</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user"><div class="avatar">A</div><div class="user-info"><p class="name">Administrator</p><p class="role">PIPE CHEM Admin</p></div></div>
+      <button class="btn-logout" onclick="window.PC.adminLogout();window.location.replace('./login.html');">&#128682; Logout</button>
+    </div>
+  </aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="topbar-left"><span class="page-title">Customer Inquiries</span><span class="page-sub">Manage all chemical supply requests</span></div>
+      <div class="topbar-right"><div class="admin-avatar">A</div></div>
+    </header>
+    <div class="admin-content">
+
+      <!-- Stats -->
+      <div class="stats-cards" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-card"><div class="stat-icon gold">&#128203;</div><div class="stat-info"><div class="s-val" id="i-total">0</div><div class="s-lbl">Total Inquiries</div></div></div>
+        <div class="stat-card"><div class="stat-icon red">&#9203;</div><div class="stat-info"><div class="s-val" id="i-pending">0</div><div class="s-lbl">Pending</div></div></div>
+        <div class="stat-card"><div class="stat-icon blue">&#128257;</div><div class="stat-info"><div class="s-val" id="i-inprog">0</div><div class="s-lbl">In Progress</div></div></div>
+        <div class="stat-card"><div class="stat-icon green">&#9989;</div><div class="stat-info"><div class="s-val" id="i-resolved">0</div><div class="s-lbl">Resolved</div></div></div>
+      </div>
+
+      <!-- Filter Row -->
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap;">
+        <div class="search-bar" style="flex:1;min-width:220px;">
+          <span class="search-icon">&#128269;</span>
+          <input type="text" id="inq-search" placeholder="Search by name, chemical, email..." oninput="filterInquiries()">
+        </div>
+        <select id="status-filter" class="admin-input" style="width:160px;" onchange="filterInquiries()">
+          <option value="">All Status</option>
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Resolved">Resolved</option>
+        </select>
+        <select id="chem-filter" class="admin-input" style="width:200px;" onchange="filterInquiries()">
+          <option value="">All Chemicals</option>
+          <option>Hydrochloric Acid (HCl) 30-32%</option>
+          <option>Dilute Sulphuric Acid 70-74%</option>
+          <option>Dilute Nitric Acid 24%</option>
+          <option>Sodium Sulphate 93-99%</option>
+          <option>Phosphoric Acid 78%</option>
+          <option>Sodium Hypochlorite 10-12%</option>
+          <option>Ferric Alum</option>
+          <option>Speciality Chemicals</option>
+          <option>Spent Solvents</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div class="admin-panel">
+        <div class="admin-panel-header">
+          <div><div class="panel-title">All Inquiries</div><div class="panel-sub" id="inq-count-label">Showing all inquiries</div></div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead>
+              <tr><th>#</th><th>ID</th><th>Customer</th><th>Chemical</th><th>Quantity</th><th>Price</th><th>Type</th><th>Location</th><th>Date</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="inq-tbody">
+              <tr><td colspan="11" style="text-align:center;padding:30px;color:var(--gray);">No inquiries found.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Inquiry Modal -->
+<div class="modal-overlay" id="view-inq-modal">
+  <div class="modal-box" style="max-width:640px;">
+    <div class="modal-header"><h3 class="modal-title">&#128203; Inquiry Details</h3><button class="modal-close" onclick="document.getElementById('view-inq-modal').classList.remove('show')">&#10005;</button></div>
+    <div id="view-inq-body"></div>
+
+    <!-- Admin Reply / Notification Section -->
+    <div style="border-top:1px solid var(--gray-light);margin-top:16px;padding-top:16px;">
+      <p style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:8px;">&#128276; Send Notification to Customer</p>
+      <select id="notif-type-select" class="admin-input" style="margin-bottom:10px;width:100%;">
+        <option value="inquiry_update">&#128203; Inquiry Update</option>
+        <option value="approval">&#9989; Inquiry Approved / Quotation Ready</option>
+        <option value="appointment">&#128197; Appointment Scheduled</option>
+        <option value="rejection">&#10060; Inquiry Not Fulfilled</option>
+      </select>
+      <textarea id="admin-notif-msg" class="admin-input" rows="3" placeholder="Write a message to the customer (e.g., 'Your inquiry for HCl has been approved. Quotation: ₹12,000/MT. Delivery: Ex-Plant, GNFC.')..."></textarea>
+      <p style="font-size:.74rem;color:var(--gray);margin-top:4px;">This message will appear in the customer's &#128276; My Account notifications.</p>
+    </div>
+
+    <div class="modal-footer" style="margin-top:12px;">
+      <button class="btn-sm btn-sm-success" id="inq-modal-resolve">&#9989; Mark Resolved &amp; Notify</button>
+      <button class="btn-sm btn-sm-gold" id="inq-modal-progress">&#128257; In Progress &amp; Notify</button>
+      <button class="btn-sm btn-sm-danger" onclick="document.getElementById('view-inq-modal').classList.remove('show')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/components.js"></script>
+<script>
+(function () {
+  if (!window.PC.isAdminLoggedIn()) { window.location.replace('./login.html'); return; }
+  var allInq = [];
+  var currentInqId = null;
+
+  function loadInquiries() {
+    allInq = window.PC.getInquiries().reverse();
+    var pending  = allInq.filter(function(i){ return i.status==='Pending'; }).length;
+    var inprog   = allInq.filter(function(i){ return i.status==='In Progress'; }).length;
+    var resolved = allInq.filter(function(i){ return i.status==='Resolved'; }).length;
+    document.getElementById('i-total').textContent    = allInq.length;
+    document.getElementById('i-pending').textContent  = pending;
+    document.getElementById('i-inprog').textContent   = inprog;
+    document.getElementById('i-resolved').textContent = resolved;
+    renderInquiries(allInq);
+  }
+
+  function renderInquiries(arr) {
+    document.getElementById('inq-count-label').textContent = 'Showing ' + arr.length + ' inquir' + (arr.length===1?'y':'ies');
+    var tbody = document.getElementById('inq-tbody');
+    if (!arr.length) {
+      tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:30px;color:var(--gray);">No inquiries found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = arr.map(function(i, idx) {
+      var sClass = i.status==='Pending'?'badge-warning':i.status==='Resolved'?'badge-success':'badge-info';
+      return '<tr>' +
+        '<td>' + (idx+1) + '</td>' +
+        '<td><strong style="font-size:.78rem;">' + i.id + '</strong></td>' +
+        '<td><strong>' + i.name + '</strong><br><small style="color:var(--gray)">' + i.company + '</small></td>' +
+        '<td style="max-width:160px;">' + i.chemical + '</td>' +
+        '<td>' + i.quantity + '</td>' +
+        '<td>' + i.expectedPrice + '</td>' +
+        '<td><span class="badge badge-navy">' + i.deliveryType + '</span></td>' +
+        '<td style="max-width:120px;font-size:.84rem;">' + i.location + '</td>' +
+        '<td>' + window.PC.formatDate(i.createdAt) + '</td>' +
+        '<td><span class="badge ' + sClass + '">' + i.status + '</span></td>' +
+        '<td><button class="btn-sm btn-sm-gold" onclick="viewInquiry(\'' + i.id + '\')">View</button></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  window.filterInquiries = function() {
+    var q    = document.getElementById('inq-search').value.toLowerCase();
+    var st   = document.getElementById('status-filter').value;
+    var chem = document.getElementById('chem-filter').value;
+    renderInquiries(allInq.filter(function(i){
+      var matchQ  = !q   || (i.name+i.email+i.chemical+i.company+i.phone).toLowerCase().includes(q);
+      var matchSt = !st  || i.status === st;
+      var matchCh = !chem || i.chemical.includes(chem);
+      return matchQ && matchSt && matchCh;
+    }));
+  };
+
+  window.viewInquiry = function(id) {
+    currentInqId = id;
+    var i = allInq.find(function(x){ return x.id===id; });
+    if (!i) return;
+    /* Reset notification area */
+    var msgBox = document.getElementById('admin-notif-msg');
+    if (msgBox) msgBox.value = i.adminNote || '';
+    document.getElementById('view-inq-body').innerHTML =
+      '<table style="width:100%;border-collapse:collapse;font-size:.9rem;">' +
+      row('Inquiry ID', i.id) + row('Customer', i.name) + row('Company', i.company) +
+      row('Phone', i.phone) + row('Email', i.email) + row('Chemical', i.chemical) +
+      row('Quantity', i.quantity) + row('Expected Price', i.expectedPrice) +
+      row('Delivery Type', i.deliveryType) + row('Location', i.location) +
+      row('Remarks', i.remarks || 'None') + row('Submitted On', window.PC.formatDateTime(i.createdAt)) +
+      (i.adminNote ? row('Last Admin Message', '<em style="color:var(--navy);">' + i.adminNote + '</em>') : '') +
+      row('Status', '<span class="badge ' + (i.status==='Pending'?'badge-warning':i.status==='Resolved'?'badge-success':'badge-info') + '">' + i.status + '</span>') +
+      '</table>';
+    document.getElementById('view-inq-modal').classList.add('show');
+  };
+
+  function row(label, val) {
+    return '<tr style="border-bottom:1px solid var(--gray-light);">' +
+      '<td style="padding:10px;font-weight:700;color:var(--navy);width:38%">' + label + '</td>' +
+      '<td style="padding:10px;">' + val + '</td></tr>';
+  }
+
+  document.getElementById('inq-modal-resolve').addEventListener('click', function(){
+    updateInqStatus(currentInqId, 'Resolved');
+  });
+  document.getElementById('inq-modal-progress').addEventListener('click', function(){
+    updateInqStatus(currentInqId, 'In Progress');
+  });
+
+  function updateInqStatus(id, status) {
+    var adminMsg = (document.getElementById('admin-notif-msg').value || '').trim();
+    var notifType = document.getElementById('notif-type-select').value || 'inquiry_update';
+
+    var inqs = window.PC.getInquiries().map(function(i){
+      if (i.id === id) {
+        i.status = status;
+        if (adminMsg) i.adminNote = adminMsg;
+      }
+      return i;
+    });
+    window.PC.saveInquiries(inqs);
+
+    /* Fire user notification if inquiry is linked to a user account */
+    var inq = inqs.find(function(i){ return i.id === id; });
+    if (inq && inq.userId) {
+      var statusLabel = {
+        'Resolved':    '✅ Inquiry Resolved',
+        'In Progress': '🔄 Inquiry In Progress'
+      }[status] || ('📋 Inquiry Updated: ' + status);
+
+      var defaultMsg = {
+        'Resolved':    'Your inquiry for ' + inq.chemical + ' has been resolved.',
+        'In Progress': 'Your inquiry for ' + inq.chemical + ' is now being processed.'
+      }[status] || 'Your inquiry status has been updated to: ' + status;
+
+      window.PC.addUserNotification(
+        inq.userId,
+        notifType,
+        statusLabel,
+        adminMsg || defaultMsg,
+        id
+      );
+    }
+
+    /* Also fire admin notification for own log */
+    window.PC.addAdminNotification(
+      'inquiry_update',
+      'Inquiry ' + status + ': ' + (inq ? inq.chemical : id),
+      adminMsg ? 'Message sent to customer: ' + adminMsg : 'Status updated — no message sent.',
+      id
+    );
+
+    document.getElementById('view-inq-modal').classList.remove('show');
+    document.getElementById('admin-notif-msg').value = '';
+    loadInquiries();
+    showAdminToast('Status updated & customer notified!', 'success');
+  }
+
+  function showAdminToast(msg, type) {
+    var t = document.createElement('div');
+    t.className = 'toast t-' + type + ' show';
+    t.textContent = (type==='success'?'✅ ':'❌ ') + msg;
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;transform:translateX(0);';
+    document.body.appendChild(t);
+    setTimeout(function(){ t.remove(); }, 3000);
+  }
+
+  loadInquiries();
+}());
+</script>
+</body>
+</html>
+

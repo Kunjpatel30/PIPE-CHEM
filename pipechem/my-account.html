@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account — PIPE CHEM</title>
+  <meta name="description" content="View your inquiries, notifications, and appointment details from PIPE CHEM.">
+  <link rel="icon" href="./assets/images/logo.png" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/css/style.css">
+  <style>
+    /* ─── My Account Page ─── */
+    .account-page { min-height: 100vh; padding: 120px 0 60px; background: var(--off-white); }
+    .account-layout { display: grid; grid-template-columns: 280px 1fr; gap: 28px; align-items: start; }
+    @media(max-width:860px){ .account-layout { grid-template-columns: 1fr; } }
+
+    /* Sidebar */
+    .account-sidebar { background:#fff; border-radius:20px; padding:28px; box-shadow:0 2px 16px rgba(27,42,74,.07); position:sticky; top:100px; }
+    .acc-avatar { width:72px;height:72px;background:var(--gradient-navy);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#fff;font-weight:800;margin:0 auto 14px; }
+    .acc-name { text-align:center; font-size:1.05rem; font-weight:800; color:var(--navy); margin-bottom:4px; }
+    .acc-email { text-align:center; font-size:.78rem; color:var(--gray); margin-bottom:20px; }
+    .acc-nav-link { display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;color:var(--navy);font-size:.88rem;font-weight:600;text-decoration:none;transition:background .2s;cursor:pointer;border:none;background:none;width:100%;text-align:left;margin-bottom:4px; }
+    .acc-nav-link:hover, .acc-nav-link.active { background:rgba(27,42,74,.07); }
+    .acc-nav-link .acc-icon { font-size:1rem;width:20px;text-align:center; }
+    .acc-notif-count { margin-left:auto;background:#E74C3C;color:#fff;font-size:.62rem;font-weight:800;border-radius:50%;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px; }
+    .acc-logout-btn { width:100%;margin-top:16px;padding:11px;border-radius:12px;border:1.5px solid rgba(231,76,60,.3);background:none;color:#E74C3C;font-size:.88rem;font-weight:700;cursor:pointer;transition:background .2s; }
+    .acc-logout-btn:hover { background:rgba(231,76,60,.06); }
+
+    /* Main content */
+    .account-main-panel { display:flex; flex-direction:column; gap:24px; }
+    .acc-panel { background:#fff; border-radius:20px; padding:28px; box-shadow:0 2px 16px rgba(27,42,74,.07); }
+    .acc-panel-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:20px; }
+    .acc-panel-title { font-size:1.05rem;font-weight:800;color:var(--navy); }
+    .acc-panel-sub { font-size:.78rem;color:var(--gray);margin-top:2px; }
+
+    /* Notification items */
+    .notif-list { display:flex;flex-direction:column;gap:10px; }
+    .notif-item { display:flex;gap:14px;padding:14px 16px;border-radius:14px;border:1.5px solid var(--gray-light);transition:border-color .2s;cursor:pointer; }
+    .notif-item.unread { border-color:rgba(27,42,74,.2);background:rgba(27,42,74,.03); }
+    .notif-item:hover { border-color:rgba(201,168,76,.4); }
+    .notif-item .n-icon { font-size:1.6rem;flex-shrink:0;width:36px;text-align:center;padding-top:2px; }
+    .notif-item .n-content .n-title { font-weight:700;color:var(--navy);font-size:.88rem;margin-bottom:3px; }
+    .notif-item .n-content .n-body  { color:var(--text-secondary);font-size:.83rem;line-height:1.55; }
+    .notif-item .n-content .n-time  { color:var(--gray);font-size:.73rem;margin-top:5px; }
+    .notif-item .n-unread-dot { width:8px;height:8px;background:#E74C3C;border-radius:50%;flex-shrink:0;margin-top:6px; }
+
+    /* Inquiry table */
+    .acc-inq-table { width:100%;border-collapse:collapse;font-size:.86rem; }
+    .acc-inq-table th { padding:10px 14px;text-align:left;font-weight:700;color:var(--gray);font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--gray-light);background:var(--off-white); }
+    .acc-inq-table td { padding:12px 14px;border-bottom:1px solid var(--gray-light);color:var(--text-primary);vertical-align:middle; }
+    .acc-inq-table tr:hover td { background:rgba(27,42,74,.02); }
+
+    /* Status tabs */
+    .acc-tabs { display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px; }
+    .acc-tab { padding:7px 18px;border-radius:100px;border:1.5px solid var(--gray-light);font-size:.82rem;font-weight:600;color:var(--gray);cursor:pointer;background:none;transition:all .2s; }
+    .acc-tab.active { border-color:var(--navy);color:var(--navy);background:rgba(27,42,74,.07); }
+    .acc-tab:hover { border-color:var(--navy);color:var(--navy); }
+
+    /* Profile info */
+    .profile-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
+    @media(max-width:560px){ .profile-grid { grid-template-columns:1fr; } }
+    .profile-field { padding:14px;background:var(--off-white);border-radius:12px;border:1px solid var(--gray-light); }
+    .profile-field label { display:block;font-size:.72rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px; }
+    .profile-field span { font-size:.92rem;font-weight:600;color:var(--navy); }
+
+    /* Empty state */
+    .empty-state { text-align:center;padding:40px 20px; }
+    .empty-state .es-icon { font-size:3rem;margin-bottom:12px; }
+    .empty-state h4 { color:var(--navy);margin-bottom:8px; }
+    .empty-state p { color:var(--gray);font-size:.88rem; }
+  </style>
+</head>
+<body>
+<div id="header-inject"></div>
+
+<section class="account-page">
+  <div class="container">
+    <div class="account-layout">
+
+      <!-- Sidebar -->
+      <div class="account-sidebar">
+        <div class="acc-avatar" id="acc-avatar">?</div>
+        <div class="acc-name" id="acc-name">Loading...</div>
+        <div class="acc-email" id="acc-email"></div>
+        <button class="acc-nav-link active" onclick="showTab('notifications')" id="tab-btn-notifications">
+          <span class="acc-icon">&#128276;</span> Notifications
+          <span class="acc-notif-count" id="sidebar-notif-count" style="display:none;"></span>
+        </button>
+        <button class="acc-nav-link" onclick="showTab('inquiries')" id="tab-btn-inquiries">
+          <span class="acc-icon">&#128203;</span> My Inquiries
+        </button>
+        <button class="acc-nav-link" onclick="showTab('profile')" id="tab-btn-profile">
+          <span class="acc-icon">&#128100;</span> My Profile
+        </button>
+        <button class="acc-logout-btn" onclick="doLogout()">&#128682; Logout</button>
+        <a href="./inquiry.html" class="btn btn-navy" style="display:block;text-align:center;margin-top:12px;border-radius:12px;">&#43; New Inquiry</a>
+      </div>
+
+      <!-- Main Panels -->
+      <div class="account-main-panel">
+
+        <!-- Notifications Panel -->
+        <div class="acc-panel" id="panel-notifications">
+          <div class="acc-panel-header">
+            <div>
+              <div class="acc-panel-title">&#128276; Notifications</div>
+              <div class="acc-panel-sub">Updates from PIPE CHEM about your inquiries and appointments</div>
+            </div>
+            <button onclick="clearAllNotifs()" class="btn btn-outline-gold" style="font-size:.78rem;padding:6px 14px;border-radius:8px;">Mark All Read</button>
+          </div>
+          <div class="notif-list" id="user-notif-list">
+            <div class="empty-state"><div class="es-icon">&#128276;</div><h4>No notifications yet</h4><p>When the admin responds to your inquiry or schedules an appointment, you'll see it here.</p></div>
+          </div>
+        </div>
+
+        <!-- Inquiries Panel -->
+        <div class="acc-panel" id="panel-inquiries" style="display:none;">
+          <div class="acc-panel-header">
+            <div>
+              <div class="acc-panel-title">&#128203; My Inquiries</div>
+              <div class="acc-panel-sub">All chemical supply requests you have submitted</div>
+            </div>
+            <a href="./inquiry.html" class="btn btn-navy" style="font-size:.8rem;padding:8px 16px;border-radius:10px;">&#43; New Inquiry</a>
+          </div>
+          <div class="acc-tabs">
+            <button class="acc-tab active" onclick="filterMyInq('')">All</button>
+            <button class="acc-tab" onclick="filterMyInq('Pending')">Pending</button>
+            <button class="acc-tab" onclick="filterMyInq('In Progress')">In Progress</button>
+            <button class="acc-tab" onclick="filterMyInq('Resolved')">Resolved</button>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="acc-inq-table">
+              <thead>
+                <tr><th>Chemical</th><th>Qty (MT)</th><th>Price</th><th>Type</th><th>Date</th><th>Status</th><th>Admin Message</th></tr>
+              </thead>
+              <tbody id="my-inq-tbody">
+                <tr><td colspan="7" style="text-align:center;padding:28px;color:var(--gray);">No inquiries submitted yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Profile Panel -->
+        <div class="acc-panel" id="panel-profile" style="display:none;">
+          <div class="acc-panel-header">
+            <div><div class="acc-panel-title">&#128100; My Profile</div><div class="acc-panel-sub">Your registered account information</div></div>
+          </div>
+          <div class="profile-grid" id="profile-grid"></div>
+          <div style="margin-top:20px;padding:14px;background:rgba(27,42,74,.04);border-radius:12px;border:1px solid rgba(27,42,74,.1);">
+            <p style="font-size:.82rem;color:var(--gray);">&#128274; To update your contact information, please contact us at <strong>+91 9558821244</strong> or <a href="mailto:pipechem2004@gmail.com" style="color:var(--navy);">pipechem2004@gmail.com</a>.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="footer-inject"></div>
+<script src="./assets/js/components.js"></script>
+<script>
+(function () {
+  /* ── Auth guard ── */
+  var user = window.PC.getCurrentUser();
+  if (!user) {
+    window.location.replace('./login.html?redirect=my-account');
+    return;
+  }
+
+  /* ── Populate sidebar ── */
+  document.getElementById('acc-avatar').textContent = user.name.charAt(0).toUpperCase();
+  document.getElementById('acc-name').textContent   = user.name;
+  document.getElementById('acc-email').textContent  = user.email;
+
+  var currentTab = 'notifications';
+
+  /* ── Tab navigation ── */
+  window.showTab = function(tab) {
+    currentTab = tab;
+    ['notifications', 'inquiries', 'profile'].forEach(function(t){
+      document.getElementById('panel-' + t).style.display   = t === tab ? 'block' : 'none';
+      document.getElementById('tab-btn-' + t).classList.toggle('active', t === tab);
+    });
+    if (tab === 'notifications') loadNotifications();
+    if (tab === 'inquiries')     loadInquiries();
+    if (tab === 'profile')       loadProfile();
+  };
+
+  /* ── Load Notifications ── */
+  function loadNotifications() {
+    var notifs = window.PC.getUserNotifications(user.id);
+    var unread = notifs.filter(function(n){ return !n.read; }).length;
+    var countEl = document.getElementById('sidebar-notif-count');
+    if (unread > 0) {
+      countEl.textContent = unread;
+      countEl.style.display = 'inline-block';
+    } else {
+      countEl.style.display = 'none';
+    }
+
+    var listEl = document.getElementById('user-notif-list');
+    if (!notifs.length) {
+      listEl.innerHTML = '<div class="empty-state"><div class="es-icon">&#128276;</div><h4>No notifications yet</h4><p>When the admin responds to your inquiry or schedules an appointment, you\'ll see updates here.</p></div>';
+      return;
+    }
+
+    var icons = {
+      inquiry_received: '&#128203;',
+      inquiry_update:   '&#128257;',
+      approval:         '&#9989;',
+      appointment:      '&#128197;',
+      rejection:        '&#10060;',
+      contact:          '&#128231;'
+    };
+
+    listEl.innerHTML = notifs.map(function(n) {
+      return '<div class="notif-item' + (n.read ? '' : ' unread') + '" onclick="markNotifRead(\'' + n.id + '\', this)">' +
+        '<div class="n-icon">' + (icons[n.type] || '&#128276;') + '</div>' +
+        '<div class="n-content">' +
+          '<div class="n-title">' + n.title + '</div>' +
+          '<div class="n-body">' + n.body + '</div>' +
+          '<div class="n-time">' + window.PC.formatDateTime(n.createdAt) + '</div>' +
+        '</div>' +
+        (n.read ? '' : '<div class="n-unread-dot"></div>') +
+        '</div>';
+    }).join('');
+  }
+
+  window.markNotifRead = function(notifId, el) {
+    window.PC.markUserNotifRead(user.id, notifId);
+    if (el) {
+      el.classList.remove('unread');
+      var dot = el.querySelector('.n-unread-dot');
+      if (dot) dot.remove();
+    }
+    /* Update sidebar count */
+    var notifs = window.PC.getUserNotifications(user.id);
+    var unread = notifs.filter(function(n){ return !n.read; }).length;
+    var countEl = document.getElementById('sidebar-notif-count');
+    if (unread > 0) { countEl.textContent = unread; } else { countEl.style.display = 'none'; }
+  };
+
+  window.clearAllNotifs = function() {
+    window.PC.clearAllUserNotifs(user.id);
+    loadNotifications();
+  };
+
+  /* ── Load Inquiries ── */
+  var currentFilter = '';
+  function loadInquiries() {
+    var allInq = window.PC.getInquiries().filter(function(i){ return i.userId === user.id; }).reverse();
+    var filtered = currentFilter ? allInq.filter(function(i){ return i.status === currentFilter; }) : allInq;
+    var tbody = document.getElementById('my-inq-tbody');
+    if (!filtered.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--gray);">No inquiries found for this filter.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = filtered.map(function(i){
+      var sClass = i.status==='Pending'?'badge-warning':i.status==='Resolved'?'badge-success':'badge-info';
+      return '<tr>' +
+        '<td><strong>' + i.chemical + '</strong></td>' +
+        '<td>' + i.quantity + '</td>' +
+        '<td>' + i.expectedPrice + '</td>' +
+        '<td>' + i.deliveryType + '</td>' +
+        '<td>' + window.PC.formatDate(i.createdAt) + '</td>' +
+        '<td><span class="badge ' + sClass + '" style="padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;">' + i.status + '</span></td>' +
+        '<td style="max-width:200px;font-size:.82rem;color:' + (i.adminNote ? 'var(--navy)' : 'var(--gray)') + ';">' +
+          (i.adminNote
+            ? '<div style="background:rgba(27,42,74,.05);border-radius:8px;padding:6px 10px;border-left:3px solid var(--navy);">' + i.adminNote + '</div>'
+            : '&#8212; Awaiting response') +
+        '</td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  window.filterMyInq = function(status) {
+    currentFilter = status;
+    document.querySelectorAll('.acc-tab').forEach(function(t){ t.classList.remove('active'); });
+    event.target.classList.add('active');
+    loadInquiries();
+  };
+
+  /* ── Load Profile ── */
+  function loadProfile() {
+    var grid = document.getElementById('profile-grid');
+    grid.innerHTML = [
+      ['Full Name',    user.name],
+      ['Email',        user.email],
+      ['Phone',        user.phone],
+      ['Company',      user.company || 'Not provided'],
+      ['Member Since', window.PC.formatDate(user.createdAt)],
+      ['Account Status', user.status || 'Active']
+    ].map(function(f){
+      return '<div class="profile-field"><label>' + f[0] + '</label><span>' + f[1] + '</span></div>';
+    }).join('');
+  }
+
+  /* ── Logout ── */
+  window.doLogout = function() {
+    window.PC.userLogout();
+    window.location.replace('./index.html');
+  };
+
+  /* ── Also update header notif badge from this page ── */
+  /* (components.js already reads user notifications for the badge on render) */
+
+  /* ── Initial load ── */
+  loadNotifications();
+
+}());
+</script>
+</body>
+</html>

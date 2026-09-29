@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Login — PIPE CHEM</title>
+  <link rel="icon" href="./assets/images/logo.png" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+
+<body>
+  <div id="header-inject"></div>
+
+  <section class="auth-page">
+    <div
+      style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 20% 80%,rgba(201,168,76,.08) 0%,transparent 70%),radial-gradient(ellipse 50% 60% at 80% 20%,rgba(201,168,76,.06) 0%,transparent 70%);pointer-events:none;">
+    </div>
+    <div class="auth-box">
+      <div class="auth-logo">
+        <img src="./assets/images/logo2.png" alt="PIPE CHEM">
+      </div>
+      <h1 class="auth-title">Welcome Back</h1>
+      <p class="auth-sub">Sign in to your PIPE CHEM account</p>
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email Address</label>
+          <input type="email" id="login-email" class="form-control" placeholder="you@company.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-pass">Password</label>
+          <div class="pass-wrap">
+            <input type="password" id="login-pass" class="form-control" placeholder="Enter your password" required>
+            <button type="button" class="pass-toggle" id="pass-toggle-btn" title="Show/Hide Password">&#128065;</button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:flex-end;margin-top:-8px;margin-bottom:18px;">
+          <a href="#" style="font-size:.84rem;color:var(--navy);font-weight:600;">Forgot Password?</a>
+        </div>
+        <button type="submit" class="btn-auth" id="login-btn">Sign In</button>
+      </form>
+      <div class="divider-text">or</div>
+      <p class="auth-switch">Don't have an account? <a href="./register.html">Create Account</a></p>
+      <p style="text-align:center;margin-top:16px;font-size:.8rem;color:var(--gray);">Admin? <a
+          href="./admin/login.html" style="color:var(--navy);font-weight:700;">Admin Panel &#8594;</a></p>
+    </div>
+  </section>
+
+  <div id="footer-inject"></div>
+  <script src="./assets/js/components.js"></script>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var redirect = params.get('redirect') || 'my-account';
+      /* Map shorthand keys to file paths */
+      var redirectMap = { 'inquiry': './inquiry.html', 'my-account': './my-account.html', 'index': './index.html' };
+      var redirectUrl = redirectMap[redirect] || './' + redirect + '.html';
+
+      if (window.PC && window.PC.isUserLoggedIn()) { window.location.replace(redirectUrl); }
+      document.getElementById('pass-toggle-btn').addEventListener('click', function () {
+        var inp = document.getElementById('login-pass');
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+        this.innerHTML = inp.type === 'password' ? '&#128065;' : '&#128274;';
+      });
+      document.getElementById('login-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var email = document.getElementById('login-email').value.trim().toLowerCase();
+        var pass = document.getElementById('login-pass').value;
+        if (!email || !pass) { window.showToast('Please enter your email and password.', 'error'); return; }
+        var users = window.PC.getUsers();
+        var user = users.find(function (u) { return u.email === email && u.password === pass; });
+        if (!user) { window.showToast('Invalid email or password.', 'error'); return; }
+        if (user.blocked) { window.showToast('Your account has been suspended. Please contact us.', 'error'); return; }
+        var btn = document.getElementById('login-btn');
+        btn.textContent = 'Signing in...';
+        btn.disabled = true;
+        localStorage.setItem('pc_current_user', JSON.stringify(user));
+        setTimeout(function () {
+          window.showToast('Welcome back, ' + user.name + '!', 'success');
+          setTimeout(function () { window.location.replace(redirectUrl); }, 900);
+        }, 700);
+      });
+    }());
+  </script>
+</body>
+
+</html>

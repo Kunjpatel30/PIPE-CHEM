@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports — PIPE CHEM Admin</title>
+  <link rel="icon" href="../assets/images/logo.png" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="sidebar-logo"><img src="../assets/images/logo.png" alt="PIPE CHEM"><span>Admin Panel</span></div>
+    <nav class="sidebar-nav">
+      <p class="sidebar-section-label">Overview</p>
+      <a href="dashboard.html" class="sidebar-link"><span class="s-icon">&#128200;</span> Dashboard</a>
+      <p class="sidebar-section-label">Management</p>
+      <a href="users.html" class="sidebar-link"><span class="s-icon">&#128101;</span> User Management</a>
+      <a href="inquiries.html" class="sidebar-link"><span class="s-icon">&#128203;</span> Inquiries</a>
+      <a href="appointments.html" class="sidebar-link"><span class="s-icon">&#128197;</span> Appointments</a>
+      <a href="reports.html" class="sidebar-link active"><span class="s-icon">&#128220;</span> Reports</a>
+      <p class="sidebar-section-label">Website</p>
+      <a href="../index.html" class="sidebar-link" target="_blank"><span class="s-icon">&#127760;</span> View Website</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user"><div class="avatar">A</div><div class="user-info"><p class="name">Administrator</p><p class="role">PIPE CHEM Admin</p></div></div>
+      <button class="btn-logout" onclick="window.PC.adminLogout();window.location.replace('./login.html');">&#128682; Logout</button>
+    </div>
+  </aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="topbar-left"><span class="page-title">Reports &amp; Summary</span><span class="page-sub">Business overview and analytics</span></div>
+      <div class="topbar-right">
+        <button class="btn-primary-admin" onclick="exportReport()">&#128190; Export Report</button>
+        <div class="admin-avatar">A</div>
+      </div>
+    </header>
+    <div class="admin-content">
+
+      <!-- Overview Stats -->
+      <div class="stats-cards">
+        <div class="stat-card"><div class="stat-icon blue">&#128101;</div><div class="stat-info"><div class="s-val" id="r-users">0</div><div class="s-lbl">Total Users</div></div></div>
+        <div class="stat-card"><div class="stat-icon gold">&#128203;</div><div class="stat-info"><div class="s-val" id="r-inq">0</div><div class="s-lbl">Total Inquiries</div></div></div>
+        <div class="stat-card"><div class="stat-icon green">&#9989;</div><div class="stat-info"><div class="s-val" id="r-resolved">0</div><div class="s-lbl">Resolved</div></div></div>
+        <div class="stat-card"><div class="stat-icon red">&#9203;</div><div class="stat-info"><div class="s-val" id="r-pending">0</div><div class="s-lbl">Pending</div></div></div>
+      </div>
+
+      <div class="dash-grid">
+        <!-- Inquiry Status Chart -->
+        <div class="admin-panel">
+          <div class="admin-panel-header"><div class="panel-title">Inquiry Status Distribution</div></div>
+          <div class="admin-panel-body" style="text-align:center;">
+            <div class="donut-placeholder" id="donut-chart"></div>
+            <div class="legend" id="status-legend"></div>
+          </div>
+        </div>
+
+        <!-- Chemical Demand Chart -->
+        <div class="admin-panel">
+          <div class="admin-panel-header"><div class="panel-title">Most Inquired Chemicals</div></div>
+          <div class="admin-panel-body">
+            <div id="bar-chart-wrap" class="bar-chart"></div>
+          </div>
+        </div>
+
+        <!-- Top Customers Table -->
+        <div class="admin-panel">
+          <div class="admin-panel-header"><div class="panel-title">Top Customers by Inquiries</div></div>
+          <div style="overflow-x:auto;">
+            <table class="admin-table">
+              <thead><tr><th>#</th><th>Customer</th><th>Company</th><th>Inquiries</th></tr></thead>
+              <tbody id="top-customers-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Delivery Type Summary -->
+        <div class="admin-panel">
+          <div class="admin-panel-header"><div class="panel-title">Delivery Type Summary</div></div>
+          <div class="admin-panel-body">
+            <div id="delivery-summary"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Full Inquiry Summary Table -->
+      <div class="admin-panel" style="margin-top:24px;">
+        <div class="admin-panel-header"><div class="panel-title">Full Inquiry Report</div><div class="panel-sub">All inquiries with complete details</div></div>
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead>
+              <tr><th>#</th><th>Date</th><th>Customer</th><th>Chemical</th><th>Qty (MT)</th><th>Price (INR/MT)</th><th>Type</th><th>Status</th></tr>
+            </thead>
+            <tbody id="report-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/components.js"></script>
+<script>
+(function () {
+  if (!window.PC.isAdminLoggedIn()) { window.location.replace('./login.html'); return; }
+
+  function loadReports() {
+    var users    = window.PC.getUsers();
+    var inquiries = window.PC.getInquiries();
+    var pending  = inquiries.filter(function(i){ return i.status==='Pending'; }).length;
+    var resolved = inquiries.filter(function(i){ return i.status==='Resolved'; }).length;
+    var inprog   = inquiries.filter(function(i){ return i.status==='In Progress'; }).length;
+
+    document.getElementById('r-users').textContent    = users.length;
+    document.getElementById('r-inq').textContent      = inquiries.length;
+    document.getElementById('r-resolved').textContent = resolved;
+    document.getElementById('r-pending').textContent  = pending;
+
+    /* Donut chart — CSS conic-gradient */
+    var total = inquiries.length || 1;
+    var pDeg  = Math.round((pending/total)*360);
+    var rDeg  = Math.round((resolved/total)*360);
+    var iDeg  = 360 - pDeg - rDeg;
+    document.getElementById('donut-chart').style.background = 
+      'conic-gradient(var(--warning) 0deg ' + pDeg + 'deg, var(--success) ' + pDeg + 'deg ' + (pDeg+rDeg) + 'deg, var(--info) ' + (pDeg+rDeg) + 'deg 360deg)';
+    document.getElementById('status-legend').innerHTML =
+      '<div class="legend-item"><div class="legend-dot" style="background:var(--warning)"></div>Pending (' + pending + ')</div>' +
+      '<div class="legend-item"><div class="legend-dot" style="background:var(--success)"></div>Resolved (' + resolved + ')</div>' +
+      '<div class="legend-item"><div class="legend-dot" style="background:var(--info)"></div>In Progress (' + inprog + ')</div>';
+
+    /* Bar chart — chemical demand */
+    var chemCount = {};
+    inquiries.forEach(function(i){
+      var key = i.chemical.split('(')[0].trim().split(' ').slice(0,2).join(' ');
+      chemCount[key] = (chemCount[key]||0) + 1;
+    });
+    var sorted = Object.entries(chemCount).sort(function(a,b){ return b[1]-a[1]; }).slice(0,6);
+    var maxCount = sorted.length ? sorted[0][1] : 1;
+    var barWrap = document.getElementById('bar-chart-wrap');
+    if (!sorted.length) {
+      barWrap.innerHTML = '<p style="color:var(--gray);font-size:.88rem;">No data available yet.</p>';
+    } else {
+      barWrap.innerHTML = sorted.map(function(entry){
+        var pct = Math.round((entry[1]/maxCount)*100);
+        return '<div class="bar-item">' +
+          '<div class="bar" style="height:' + pct + '%;min-height:8px;" title="' + entry[0] + ': ' + entry[1] + ' inquiries"></div>' +
+          '<span class="bar-label">' + entry[0] + '</span>' +
+          '</div>';
+      }).join('');
+    }
+
+    /* Top customers */
+    var custCount = {};
+    inquiries.forEach(function(i){ custCount[i.name] = (custCount[i.name]||{count:0,company:i.company}); custCount[i.name].count++; });
+    var topCust = Object.entries(custCount).sort(function(a,b){ return b[1].count-a[1].count; }).slice(0,5);
+    var tbody = document.getElementById('top-customers-tbody');
+    if (!topCust.length) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--gray);">No data.</td></tr>';
+    } else {
+      tbody.innerHTML = topCust.map(function(entry, i){
+        return '<tr><td>' + (i+1) + '</td><td><strong>' + entry[0] + '</strong></td><td>' + entry[1].company + '</td><td><span class="badge badge-gold">' + entry[1].count + '</span></td></tr>';
+      }).join('');
+    }
+
+    /* Delivery type summary */
+    var exPlant   = inquiries.filter(function(i){ return i.deliveryType==='Ex-Plant'; }).length;
+    var delivered = inquiries.filter(function(i){ return i.deliveryType==='Delivered'; }).length;
+    document.getElementById('delivery-summary').innerHTML =
+      '<div style="display:flex;gap:20px;flex-wrap:wrap;">' +
+      '<div style="flex:1;background:var(--off-white);border:1px solid var(--gray-light);border-radius:12px;padding:24px;text-align:center;">' +
+        '<div style="font-size:2rem;font-weight:800;color:var(--navy);">' + exPlant + '</div>' +
+        '<div style="font-size:.78rem;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-top:6px;">Ex-Plant</div>' +
+      '</div>' +
+      '<div style="flex:1;background:var(--off-white);border:1px solid var(--gray-light);border-radius:12px;padding:24px;text-align:center;">' +
+        '<div style="font-size:2rem;font-weight:800;color:var(--navy);">' + delivered + '</div>' +
+        '<div style="font-size:.78rem;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-top:6px;">Delivered</div>' +
+      '</div>' +
+      '</div>';
+
+    /* Full report table */
+    var rtbody = document.getElementById('report-tbody');
+    var allSorted = inquiries.slice().reverse();
+    if (!allSorted.length) {
+      rtbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--gray);">No data available.</td></tr>';
+    } else {
+      rtbody.innerHTML = allSorted.map(function(i, idx){
+        var sClass = i.status==='Pending'?'badge-warning':i.status==='Resolved'?'badge-success':'badge-info';
+        return '<tr>' +
+          '<td>' + (idx+1) + '</td>' +
+          '<td>' + window.PC.formatDate(i.createdAt) + '</td>' +
+          '<td>' + i.name + '<br><small style="color:var(--gray)">' + i.company + '</small></td>' +
+          '<td>' + i.chemical + '</td>' +
+          '<td>' + i.quantity + '</td>' +
+          '<td>' + i.expectedPrice + '</td>' +
+          '<td>' + i.deliveryType + '</td>' +
+          '<td><span class="badge ' + sClass + '">' + i.status + '</span></td></tr>';
+      }).join('');
+    }
+  }
+
+  window.exportReport = function() {
+    var inquiries = window.PC.getInquiries();
+    var rows = [['#','Date','Customer','Company','Email','Phone','Chemical','Quantity','Price','Delivery Type','Location','Status','Remarks']];
+    inquiries.forEach(function(i, idx){
+      rows.push([idx+1, window.PC.formatDate(i.createdAt), i.name, i.company, i.email, i.phone, i.chemical, i.quantity, i.expectedPrice, i.deliveryType, i.location, i.status, i.remarks||'']);
+    });
+    var csv = rows.map(function(r){ return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+    var blob = new Blob([csv], { type: 'text/csv' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'pipechem_inquiries_report.csv'; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  loadReports();
+}());
+</script>
+</body>
+</html>
+

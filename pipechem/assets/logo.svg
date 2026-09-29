@@ -1,0 +1,47 @@
+<svg viewBox="0 0 400 520" xmlns="http://www.w3.org/2000/svg">
+  <!-- Hexagon frame (pointy-top, transparent bg) -->
+  <polygon
+    points="200,42 326,114 326,258 200,330 74,258 74,114"
+    fill="none" stroke="currentColor" stroke-width="13" stroke-linejoin="round"/>
+
+  <!-- Inner hexagon ring (subtle, smaller) -->
+  <polygon
+    points="200,68 308,130 308,242 200,304 92,242 92,130"
+    fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" opacity="0.25"/>
+
+  <!-- Benzene / molecular ring at top vertex -->
+  <polygon
+    points="200,14 213,21.5 213,36.5 200,44 187,36.5 187,21.5"
+    fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="200" cy="29" r="5" fill="currentColor"/>
+
+  <!-- ===== PC Monogram ===== -->
+  <!-- P: left bracket -->
+  <path d="M132,152 L121,152 L121,228 L132,228"
+        fill="none" stroke="currentColor" stroke-width="9"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- P: vertical stem -->
+  <line x1="143" y1="152" x2="143" y2="228"
+        stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
+  <!-- P: bowl (top arc) -->
+  <path d="M143,152 C185,152 193,160 193,178 C193,196 185,205 143,205"
+        fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- C: large open arc -->
+  <path d="M282,165 C260,138 218,135 193,163 C170,188 172,232 198,255 C220,275 255,276 282,259"
+        fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- ===== PIPE CHEM text ===== -->
+  <text x="200" y="388"
+        text-anchor="middle"
+        font-family="Georgia,'Times New Roman',serif"
+        font-size="50" font-weight="700"
+        fill="currentColor" letter-spacing="5">PIPE CHEM</text>
+
+  <!-- ===== Tagline ===== -->
+  <text x="200" y="424"
+        text-anchor="middle"
+        font-family="Arial,Helvetica,sans-serif"
+        font-size="15" font-weight="400"
+        fill="currentColor" letter-spacing="2" opacity="0.7">Reliable Chemical Sourcing</text>
+</svg>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — PIPE CHEM</title>
+  <link rel="icon" href="./assets/images/logo.png" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+
+<body>
+  <div id="header-inject"></div>
+  <section class="auth-page">
+    <div
+      style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 20% 80%,rgba(201,168,76,.08) 0%,transparent 70%);pointer-events:none;">
+    </div>
+    <div class="auth-box" style="max-width:540px;">
+      <div class="auth-logo">
+        <img src="./assets/images/logo2.png" alt="PIPE CHEM">
+      </div>
+      <h1 class="auth-title">Create Account</h1>
+      <p class="auth-sub">Register to track your inquiries and appointments</p>
+
+      <form id="reg-form" novalidate>
+        <div class="input-row">
+          <div class="form-group">
+            <label class="form-label" for="reg-fname">First Name <span class="req"
+                style="color:var(--danger)">*</span></label>
+            <input type="text" id="reg-fname" class="form-control" placeholder="First name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-lname">Last Name <span class="req"
+                style="color:var(--danger)">*</span></label>
+            <input type="text" id="reg-lname" class="form-control" placeholder="Last name" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-email">Email Address <span class="req"
+              style="color:var(--danger)">*</span></label>
+          <input type="email" id="reg-email" class="form-control" placeholder="you@company.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-phone">Phone Number <span class="req"
+              style="color:var(--danger)">*</span></label>
+          <input type="tel" id="reg-phone" class="form-control" placeholder="+91 XXXXX XXXXX" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-company">Company / Firm Name</label>
+          <input type="text" id="reg-company" class="form-control" placeholder="Your company name (optional)">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-pass">Password <span class="req"
+              style="color:var(--danger)">*</span></label>
+          <div class="pass-wrap">
+            <input type="password" id="reg-pass" class="form-control" placeholder="Create a strong password" required
+              minlength="6">
+            <button type="button" class="pass-toggle" id="reg-pass-toggle">&#128065;</button>
+          </div>
+          <p class="form-hint">Minimum 6 characters</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-confirm">Confirm Password <span class="req"
+              style="color:var(--danger)">*</span></label>
+          <input type="password" id="reg-confirm" class="form-control" placeholder="Re-enter password" required>
+        </div>
+        <button type="submit" class="btn-auth" id="reg-btn">Create Account</button>
+      </form>
+      <p class="auth-switch" style="margin-top:20px;">Already have an account? <a href="./login.html">Sign In</a></p>
+    </div>
+  </section>
+  <div id="footer-inject"></div>
+  <script src="./assets/js/components.js"></script>
+  <script>
+    (function () {
+      if (window.PC && window.PC.isUserLoggedIn()) { window.location.replace('./index.html'); }
+
+      document.getElementById('reg-pass-toggle').addEventListener('click', function () {
+        var inp = document.getElementById('reg-pass');
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+        this.innerHTML = inp.type === 'password' ? '&#128065;' : '&#128274;';
+      });
+
+      document.getElementById('reg-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var fname = document.getElementById('reg-fname').value.trim();
+        var lname = document.getElementById('reg-lname').value.trim();
+        var email = document.getElementById('reg-email').value.trim().toLowerCase();
+        var phone = document.getElementById('reg-phone').value.trim();
+        var company = document.getElementById('reg-company').value.trim();
+        var pass = document.getElementById('reg-pass').value;
+        var confirm = document.getElementById('reg-confirm').value;
+
+        if (!fname || !lname || !email || !phone || !pass) {
+          window.showToast('Please fill in all required fields.', 'error'); return;
+        }
+        if (pass.length < 6) {
+          window.showToast('Password must be at least 6 characters.', 'error'); return;
+        }
+        if (pass !== confirm) {
+          window.showToast('Passwords do not match.', 'error'); return;
+        }
+        var users = window.PC.getUsers();
+        if (users.find(function (u) { return u.email === email; })) {
+          window.showToast('This email is already registered. Please login.', 'error'); return;
+        }
+
+        var user = {
+          id: window.PC.generateId(),
+          name: fname + ' ' + lname,
+          email: email,
+          phone: phone,
+          company: company,
+          password: pass,
+          status: 'Active',
+          createdAt: new Date().toISOString()
+        };
+        users.push(user);
+        window.PC.saveUsers(users);
+        localStorage.setItem('pc_current_user', JSON.stringify(user));
+
+        /* ── Admin Notification: New Registration ── */
+        window.PC.addAdminNotification(
+          'registration',
+          'New User Registered: ' + user.name,
+          user.email + ' | ' + user.phone + (user.company ? ' | ' + user.company : ''),
+          user.id
+        );
+
+        var btn = document.getElementById('reg-btn');
+        btn.textContent = 'Creating Account...';
+        btn.disabled = true;
+        setTimeout(function () {
+          window.showToast('Account created successfully! Welcome, ' + user.name + '!', 'success');
+          setTimeout(function () { window.location.replace('./index.html'); }, 1000);
+        }, 800);
+      });
+    }());
+  </script>
+</body>
+
+</html>

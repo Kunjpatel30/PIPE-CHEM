@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login — PIPE CHEM</title>
+  <link rel="icon" href="../assets/images/logo.png" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+
+<body>
+  <div class="admin-login-page gradient-hero">
+    <div class="admin-login-box">
+      <div class="al-logo"><img src="../assets/images/logo2.png" alt="PIPE CHEM"></div>
+      <h2>Admin Panel</h2>
+      <p class="sub">Sign in with your administrator credentials</p>
+      <form id="admin-login-form" novalidate>
+        <div class="admin-form-group">
+          <label class="admin-label" for="al-user">Username</label>
+          <input type="text" id="al-user" class="admin-input" placeholder="admin" required>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-label" for="al-pass">Password</label>
+          <input type="password" id="al-pass" class="admin-input" placeholder="Enter admin password" required>
+        </div>
+        <button type="submit" class="btn-admin-login" id="al-btn">Sign In to Admin Panel</button>
+      </form>
+      <div class="admin-back-link" style="margin-top:20px;">
+        <a href="../index.html" style="color:rgba(201,168,76,.8);">&#8592; Back to Main Website</a>
+      </div>
+    </div>
+  </div>
+  </div>
+  <script src="../assets/js/components.js"></script>
+  <script>
+    (function () {
+      if (window.PC && window.PC.isAdminLoggedIn()) { window.location.replace('./dashboard.html'); }
+      document.getElementById('admin-login-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var user = document.getElementById('al-user').value.trim();
+        var pass = document.getElementById('al-pass').value;
+        if (!user || !pass) {
+          var t = document.createElement('div');
+          t.className = 'toast t-error show';
+          t.innerHTML = '&#10060; Please enter credentials.';
+          t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;transform:translateX(0);';
+          document.body.appendChild(t);
+          setTimeout(function () { t.remove(); }, 3000);
+          return;
+        }
+        if (window.PC.adminLogin(user, pass)) {
+          var btn = document.getElementById('al-btn');
+          btn.textContent = 'Signing in...';
+          btn.disabled = true;
+          setTimeout(function () { window.location.replace('./dashboard.html'); }, 700);
+        } else {
+          var t = document.createElement('div');
+          t.className = 'toast t-error show';
+          t.innerHTML = '&#10060; Invalid credentials.';
+          t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;transform:translateX(0);';
+          document.body.appendChild(t);
+          setTimeout(function () { t.remove(); }, 3000);
+        }
+      });
+    }());
+  </script>
+</body>
+
+</html>

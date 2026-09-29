@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel — PIPE CHEM</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════
+     ADMIN LOGIN GATE
+════════════════════════════════════════════════════ -->
+<div id="admin-login-gate">
+  <div class="admin-login-box">
+    <div class="admin-login-logo">
+      <img src="assets/logo.png" alt="PIPE CHEM"
+           style="height:56px;width:auto;filter:brightness(0) invert(1);display:block;margin:0 auto 0.5rem;" />
+      <h2>PIPE CHEM</h2>
+      <p>Admin Panel · Restricted Access</p>
+    </div>
+
+    <div class="admin-login-error" id="admin-login-error"></div>
+
+    <div class="admin-field">
+      <label class="admin-label" for="admin-email-input">Admin Email</label>
+      <input type="email" class="admin-input" id="admin-email-input" placeholder="admin@pipechem.com" value="admin@pipechem.com" />
+    </div>
+    <div class="admin-field">
+      <label class="admin-label" for="admin-pw-input">Password</label>
+      <input type="password" class="admin-input" id="admin-pw-input" placeholder="Enter admin password" value="admin123" />
+    </div>
+    <button class="admin-login-btn" onclick="adminLogin()">Access Admin Panel →</button>
+    <div class="back-to-site">
+      <a href="index.html">← Back to Public Website</a>
+    </div>
+    <div style="margin-top:1rem;text-align:center;font-size:.72rem;color:rgba(255,255,255,.2);">
+      Demo credentials pre-filled: admin@pipechem.com / admin123
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     ADMIN SHELL
+════════════════════════════════════════════════════ -->
+<div id="admin-shell">
+
+  <!-- ── Sidebar ── -->
+  <aside class="admin-sidebar" id="admin-sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <img src="assets/logo.png" alt="PIPE CHEM"
+             style="height:38px;width:auto;filter:brightness(0) invert(1);" />
+        <div class="sidebar-logo-text">
+          <div class="logo-name">PIPE CHEM</div>
+          <div class="logo-sub">Admin Portal</div>
+        </div>
+      </div>
+      <span class="admin-badge">Administrator</span>
+    </div>
+
+    <nav class="sidebar-nav" role="navigation" aria-label="Admin navigation">
+      <div class="sidebar-nav-section">
+        <div class="sidebar-section-label">Overview</div>
+        <a class="sidebar-link active" id="nav-dashboard" onclick="switchPanel('dashboard')" role="button" tabindex="0">
+          <span class="nav-icon">📊</span> Dashboard
+        </a>
+      </div>
+
+      <div class="sidebar-nav-section">
+        <div class="sidebar-section-label">Management</div>
+        <a class="sidebar-link" id="nav-users" onclick="switchPanel('users')" role="button" tabindex="0">
+          <span class="nav-icon">👥</span> Users
+          <span class="nav-badge gold" id="badge-users">0</span>
+        </a>
+        <a class="sidebar-link" id="nav-inquiries" onclick="switchPanel('inquiries')" role="button" tabindex="0">
+          <span class="nav-icon">📋</span> Inquiries
+          <span class="nav-badge" id="badge-inquiries">0</span>
+        </a>
+        <a class="sidebar-link" id="nav-appointments" onclick="switchPanel('appointments')" role="button" tabindex="0">
+          <span class="nav-icon">📅</span> Appointments
+        </a>
+        <a class="sidebar-link" id="nav-contacts" onclick="switchPanel('contacts')" role="button" tabindex="0">
+          <span class="nav-icon">💬</span> Messages / Queries
+          <span class="nav-badge" id="badge-contacts">0</span>
+        </a>
+      </div>
+
+      <div class="sidebar-nav-section">
+        <div class="sidebar-section-label">Analytics</div>
+        <a class="sidebar-link" id="nav-reports" onclick="switchPanel('reports')" role="button" tabindex="0">
+          <span class="nav-icon">📈</span> Reports
+        </a>
+      </div>
+
+      <div class="sidebar-nav-section">
+        <div class="sidebar-section-label">Site</div>
+        <a class="sidebar-link" href="index.html" target="_blank" role="button" tabindex="0">
+          <span class="nav-icon">🌐</span> View Website
+        </a>
+        <a class="sidebar-link" href="login.html" target="_blank" role="button" tabindex="0">
+          <span class="nav-icon">🔐</span> User Login Page
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">A</div>
+        <div class="sidebar-user-info">
+          <div class="user-name">Admin</div>
+          <div class="user-role">admin@pipechem.com</div>
+        </div>
+        <span class="sidebar-logout-btn" onclick="adminLogout()" title="Logout">⏻</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main Area ── -->
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="topbar-title">
+        <span id="topbar-title-text">Dashboard</span>
+        <span class="topbar-subtitle" id="topbar-subtitle">Overview of PIPE CHEM operations</span>
+      </div>
+      <div class="topbar-actions">
+        <div class="topbar-date" id="topbar-date"></div>
+        <button class="topbar-btn outline" onclick="refreshData()">🔄 Refresh</button>
+        <button class="topbar-btn primary" onclick="switchPanel('inquiries')">📋 View Inquiries</button>
+      </div>
+    </header>
+
+    <div class="admin-content">
+
+      <!-- ════════ DASHBOARD PANEL ════════ -->
+      <div class="admin-panel active" id="panel-dashboard">
+        <div class="kpi-grid">
+          <div class="kpi-card k1">
+            <div class="kpi-card-top">
+              <div class="kpi-icon navy">👥</div>
+              <span class="kpi-trend up" id="kpi-users-trend">+0</span>
+            </div>
+            <div class="kpi-value" id="kpi-users">0</div>
+            <div class="kpi-label">Registered Users</div>
+          </div>
+          <div class="kpi-card k2">
+            <div class="kpi-card-top">
+              <div class="kpi-icon gold">📋</div>
+              <span class="kpi-trend up" id="kpi-inq-trend">New</span>
+            </div>
+            <div class="kpi-value" id="kpi-inquiries">0</div>
+            <div class="kpi-label">Total Inquiries</div>
+          </div>
+          <div class="kpi-card k3">
+            <div class="kpi-card-top">
+              <div class="kpi-icon green">📅</div>
+              <span class="kpi-trend up">Active</span>
+            </div>
+            <div class="kpi-value" id="kpi-appts">0</div>
+            <div class="kpi-label">Appointments Set</div>
+          </div>
+          <div class="kpi-card k4">
+            <div class="kpi-card-top">
+              <div class="kpi-icon blue">💬</div>
+              <span class="kpi-trend up">New</span>
+            </div>
+            <div class="kpi-value" id="kpi-contacts">0</div>
+            <div class="kpi-label">Customer Messages</div>
+          </div>
+          <div class="kpi-card k5">
+            <div class="kpi-card-top">
+              <div class="kpi-icon red">⏳</div>
+              <span class="kpi-trend" id="kpi-pending-trend">Pending</span>
+            </div>
+            <div class="kpi-value" id="kpi-pending">0</div>
+            <div class="kpi-label">Pending Inquiries</div>
+          </div>
+        </div>
+
+        <!-- Recent Inquiries Summary -->
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <div class="panel-card-title">
+              <div class="title-icon">📋</div> Recent Inquiries
+            </div>
+            <div class="panel-card-actions">
+              <button class="topbar-btn outline" onclick="switchPanel('inquiries')">View All →</button>
+            </div>
+          </div>
+          <div id="dashboard-recent-inquiries">
+            <div class="empty-state"><div class="empty-state-icon">📋</div><h4>No inquiries yet</h4><p>Inquiries submitted from the website will appear here.</p></div>
+          </div>
+        </div>
+
+        <!-- Recent Users Summary -->
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <div class="panel-card-title">
+              <div class="title-icon">👥</div> Recent Registrations
+            </div>
+            <div class="panel-card-actions">
+              <button class="topbar-btn outline" onclick="switchPanel('users')">View All →</button>
+            </div>
+          </div>
+          <div id="dashboard-recent-users">
+            <div class="empty-state"><div class="empty-state-icon">👤</div><h4>No users registered yet</h4><p>Users who register through the website will appear here.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ USERS PANEL ════════ -->
+      <div class="admin-panel" id="panel-users">
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <div class="panel-card-title"><div class="title-icon">👥</div> Registered Users</div>
+            <div class="panel-card-actions">
+              <input type="search" class="panel-search" id="users-search" placeholder="Search users..." oninput="filterUsers()" />
+              <button class="topbar-btn outline" onclick="exportUsers()">⬇ Export</button>
+            </div>
+          </div>
+          <div id="users-table-wrap">
+            <div class="empty-state"><div class="empty-state-icon">👤</div><h4>No users registered yet</h4><p>Users who create accounts through the login page will appear here.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ INQUIRIES PANEL ════════ -->
+      <div class="admin-panel" id="panel-inquiries">
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <div class="panel-card-title"><div class="title-icon">📋</div> Customer Inquiries</div>
+            <div class="panel-card-actions">
+              <input type="search" class="panel-search" id="inq-search" placeholder="Search inquiries..." oninput="filterInquiries()" />
+              <select class="panel-search" id="inq-filter-status" onchange="filterInquiries()" style="width:140px;">
+                <option value="">All Status</option>
+                <option value="Pending">Pending</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+              <button class="topbar-btn outline" onclick="exportInquiries()">⬇ Export CSV</button>
+            </div>
+          </div>
+          <div id="inquiries-table-wrap">
+            <div class="empty-state"><div class="empty-state-icon">📋</div><h4>No inquiries yet</h4><p>Chemical inquiries submitted through the website will appear here.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ APPOINTMENTS PANEL ════════ -->
+      <div class="admin-panel" id="panel-appointments">
+        <div class="appt-grid">
+          <!-- Create Appointment Form -->
+          <div class="appt-form-card">
+            <h3>📅 Schedule New Appointment</h3>
+            <div class="form-group">
+              <label class="form-label" for="appt-customer">Customer / User</label>
+              <select class="form-control-admin" id="appt-customer">
+                <option value="">-- Select Customer --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="appt-email">Customer Email (Manual)</label>
+              <input type="email" class="form-control-admin" id="appt-email" placeholder="customer@email.com" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="appt-phone">Customer Phone</label>
+              <input type="tel" class="form-control-admin" id="appt-phone" placeholder="+91 XXXXX XXXXX" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="appt-date">Appointment Date</label>
+              <input type="date" class="form-control-admin" id="appt-date" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="appt-time">Appointment Time</label>
+              <input type="time" class="form-control-admin" id="appt-time" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="appt-type">Meeting Type</label>
+              <select class="form-control-admin" id="appt-type">
+                <option>Product Discussion</option>
+                <option>Pricing Negotiation</option>
+                <option>Site Visit</option>
+                <option>Technical Consultation</option>
+                <option>Order Confirmation</option>
+                <option>General Inquiry Follow-up</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="appt-mode">Mode</label>
+              <select class="form-control-admin" id="appt-mode">
+                <option>In-Person Meeting</option>
+                <option>Phone Call</option>
+                <option>WhatsApp / Video Call</option>
+                <option>Email</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="appt-notes">Notes / Agenda</label>
+              <textarea class="form-control-admin" id="appt-notes" rows="3" placeholder="Meeting agenda or notes..." style="resize:vertical;"></textarea>
+            </div>
+            <button class="btn-appt-create" onclick="createAppointment()">
+              📅 &nbsp;Schedule Appointment
+            </button>
+          </div>
+
+          <!-- Appointments List -->
+          <div>
+            <div class="panel-card">
+              <div class="panel-card-header">
+                <div class="panel-card-title"><div class="title-icon">📅</div> Scheduled Appointments</div>
+                <div class="panel-card-actions">
+                  <button class="topbar-btn outline" onclick="exportAppointments()">⬇ Export</button>
+                </div>
+              </div>
+              <div id="appointments-table-wrap">
+                <div class="empty-state"><div class="empty-state-icon">📅</div><h4>No appointments scheduled</h4><p>Create an appointment using the form on the left.</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ CONTACTS / MESSAGES PANEL ════════ -->
+      <div class="admin-panel" id="panel-contacts">
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <div class="panel-card-title"><div class="title-icon">💬</div> Customer Messages & Queries</div>
+            <div class="panel-card-actions">
+              <input type="search" class="panel-search" id="con-search" placeholder="Search messages..." oninput="filterContacts()" />
+              <button class="topbar-btn outline" onclick="exportContacts()">⬇ Export</button>
+            </div>
+          </div>
+          <div id="contacts-table-wrap">
+            <div class="empty-state"><div class="empty-state-icon">💬</div><h4>No messages yet</h4><p>Messages sent through the Contact Us form will appear here.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ REPORTS PANEL ════════ -->
+      <div class="admin-panel" id="panel-reports">
+        <div class="report-grid">
+          <!-- Chemicals by Inquiry Count -->
+          <div class="report-card">
+            <div class="report-card-title">⚗️ Inquiries by Chemical</div>
+            <div class="bar-chart" id="chart-chemicals">
+              <div class="empty-state" style="padding:1.5rem;"><div class="empty-state-icon" style="font-size:1.5rem;">📊</div><h4 style="font-size:.9rem;">No data yet</h4></div>
+            </div>
+          </div>
+
+          <!-- Delivery type split -->
+          <div class="report-card">
+            <div class="report-card-title">🚚 Delivery Type Split</div>
+            <div class="bar-chart" id="chart-delivery">
+              <div class="empty-state" style="padding:1.5rem;"><div class="empty-state-icon" style="font-size:1.5rem;">📊</div><h4 style="font-size:.9rem;">No data yet</h4></div>
+            </div>
+          </div>
+
+          <!-- Industry split from users -->
+          <div class="report-card">
+            <div class="report-card-title">🏭 Users by Industry</div>
+            <div class="bar-chart" id="chart-industry">
+              <div class="empty-state" style="padding:1.5rem;"><div class="empty-state-icon" style="font-size:1.5rem;">📊</div><h4 style="font-size:.9rem;">No data yet</h4></div>
+            </div>
+          </div>
+
+          <!-- Status Summary -->
+          <div class="report-card">
+            <div class="report-card-title">📋 Inquiry Status Summary</div>
+            <div class="bar-chart" id="chart-status">
+              <div class="empty-state" style="padding:1.5rem;"><div class="empty-state-icon" style="font-size:1.5rem;">📊</div><h4 style="font-size:.9rem;">No data yet</h4></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Full report table -->
+        <div class="panel-card" style="margin-top:0;">
+          <div class="panel-card-header">
+            <div class="panel-card-title"><div class="title-icon">📈</div> Activity Summary Report</div>
+            <div class="panel-card-actions">
+              <button class="topbar-btn outline" onclick="exportFullReport()">⬇ Export Report</button>
+            </div>
+          </div>
+          <div id="report-summary-table">
+            <div class="empty-state"><div class="empty-state-icon">📈</div><h4>No report data yet</h4><p>Submit inquiries and register users to see analytics here.</p></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /admin-content -->
+  </div><!-- /admin-main -->
+</div><!-- /admin-shell -->
+
+<!-- ════════ MODALS ════════ -->
+
+<!-- Inquiry Detail Modal -->
+<div class="modal-overlay" id="inq-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>📋 Inquiry Details</h3>
+      <button class="modal-close" onclick="closeModal('inq-modal')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body" id="inq-modal-body"></div>
+  </div>
+</div>
+
+<!-- User Detail Modal -->
+<div class="modal-overlay" id="user-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>👤 User Details</h3>
+      <button class="modal-close" onclick="closeModal('user-modal')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body" id="user-modal-body"></div>
+  </div>
+</div>
+
+<!-- Appointment Detail Modal -->
+<div class="modal-overlay" id="appt-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>📅 Appointment Details</h3>
+      <button class="modal-close" onclick="closeModal('appt-modal')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body" id="appt-modal-body"></div>
+  </div>
+</div>
+
+<!-- Admin Toast -->
+<div class="admin-toast" id="admin-toast"></div>
+
+<script src="js/admin.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Management — PIPE CHEM Admin</title>
+  <link rel="icon" href="../assets/images/logo.png" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="sidebar-logo"><img src="../assets/images/logo.png" alt="PIPE CHEM"><span>Admin Panel</span></div>
+    <nav class="sidebar-nav">
+      <p class="sidebar-section-label">Overview</p>
+      <a href="dashboard.html" class="sidebar-link"><span class="s-icon">&#128200;</span> Dashboard</a>
+      <p class="sidebar-section-label">Management</p>
+      <a href="users.html" class="sidebar-link active"><span class="s-icon">&#128101;</span> User Management</a>
+      <a href="inquiries.html" class="sidebar-link"><span class="s-icon">&#128203;</span> Inquiries</a>
+      <a href="appointments.html" class="sidebar-link"><span class="s-icon">&#128197;</span> Appointments</a>
+      <a href="reports.html" class="sidebar-link"><span class="s-icon">&#128220;</span> Reports</a>
+      <p class="sidebar-section-label">Website</p>
+      <a href="../index.html" class="sidebar-link" target="_blank"><span class="s-icon">&#127760;</span> View Website</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user"><div class="avatar">A</div><div class="user-info"><p class="name">Administrator</p><p class="role">PIPE CHEM Admin</p></div></div>
+      <button class="btn-logout" onclick="window.PC.adminLogout();window.location.replace('./login.html');">&#128682; Logout</button>
+    </div>
+  </aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="topbar-left"><span class="page-title">User Management</span><span class="page-sub">Manage all registered users</span></div>
+      <div class="topbar-right">
+        <div class="admin-avatar">A</div>
+      </div>
+    </header>
+    <div class="admin-content">
+      <!-- Stats -->
+      <div class="stats-cards" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card"><div class="stat-icon blue">&#128101;</div><div class="stat-info"><div class="s-val" id="u-total">0</div><div class="s-lbl">Total Users</div></div></div>
+        <div class="stat-card"><div class="stat-icon green">&#9989;</div><div class="stat-info"><div class="s-val" id="u-active">0</div><div class="s-lbl">Active Users</div></div></div>
+        <div class="stat-card"><div class="stat-icon red">&#128683;</div><div class="stat-info"><div class="s-val" id="u-blocked">0</div><div class="s-lbl">Blocked Users</div></div></div>
+      </div>
+
+      <!-- Users Table -->
+      <div class="admin-panel">
+        <div class="admin-panel-header">
+          <div><div class="panel-title">Registered Users</div><div class="panel-sub">All user accounts with login details</div></div>
+          <div class="panel-actions">
+            <div class="search-bar">
+              <span class="search-icon">&#128269;</span>
+              <input type="text" id="user-search" placeholder="Search users..." oninput="filterUsers()">
+            </div>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead>
+              <tr><th>#</th><th>Name</th><th>Email</th><th>Phone</th><th>Company</th><th>Registered</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="users-tbody">
+              <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--gray);">No users registered.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="padding:16px 24px;display:flex;align-items:center;justify-content:space-between;">
+          <div id="user-count-label" style="font-size:.82rem;color:var(--gray);">Showing 0 users</div>
+          <div class="pagination" id="user-pagination"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View User Modal -->
+<div class="modal-overlay" id="view-user-modal">
+  <div class="modal-box">
+    <div class="modal-header"><h3 class="modal-title">&#128101; User Details</h3><button class="modal-close" onclick="closeUserModal()">&#10005;</button></div>
+    <div id="view-user-body"></div>
+    <div class="modal-footer"><button class="btn-sm btn-sm-danger" onclick="closeUserModal()">Close</button></div>
+  </div>
+</div>
+
+<script src="../assets/js/components.js"></script>
+<script>
+(function () {
+  if (!window.PC.isAdminLoggedIn()) { window.location.replace('./login.html'); return; }
+  var allUsers = [];
+
+  function loadUsers() {
+    allUsers = window.PC.getUsers();
+    var active  = allUsers.filter(function(u){ return (u.status||'Active')==='Active'; }).length;
+    var blocked = allUsers.filter(function(u){ return u.status==='Blocked'; }).length;
+    document.getElementById('u-total').textContent   = allUsers.length;
+    document.getElementById('u-active').textContent  = active;
+    document.getElementById('u-blocked').textContent = blocked;
+    renderUsers(allUsers);
+  }
+
+  function renderUsers(users) {
+    var tbody = document.getElementById('users-tbody');
+    document.getElementById('user-count-label').textContent = 'Showing ' + users.length + ' user(s)';
+    if (!users.length) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--gray);">No users found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = users.map(function(u, i){
+      var sClass = (u.status||'Active')==='Active' ? 'badge-success' : 'badge-danger';
+      return '<tr>' +
+        '<td>' + (i+1) + '</td>' +
+        '<td><strong>' + u.name + '</strong></td>' +
+        '<td>' + u.email + '</td>' +
+        '<td>' + u.phone + '</td>' +
+        '<td>' + (u.company || '&#8212;') + '</td>' +
+        '<td>' + window.PC.formatDate(u.createdAt) + '</td>' +
+        '<td><span class="badge ' + sClass + '">' + (u.status||'Active') + '</span></td>' +
+        '<td style="display:flex;gap:6px;">' +
+          '<button class="btn-sm btn-sm-gold" onclick="viewUser(\'' + u.id + '\')">View</button>' +
+          '<button class="btn-sm btn-sm-danger" onclick="toggleBlock(\'' + u.id + '\')">' + ((u.status||'Active')==='Active'?'Block':'Unblock') + '</button>' +
+        '</td></tr>';
+    }).join('');
+  }
+
+  window.filterUsers = function() {
+    var q = document.getElementById('user-search').value.toLowerCase();
+    renderUsers(allUsers.filter(function(u){ return (u.name+u.email+u.phone+u.company).toLowerCase().includes(q); }));
+  };
+
+  window.viewUser = function(id) {
+    var u = allUsers.find(function(x){ return x.id===id; });
+    if (!u) return;
+    var userInquiries = window.PC.getInquiries().filter(function(i){ return i.email===u.email; });
+    document.getElementById('view-user-body').innerHTML =
+      '<table style="width:100%;border-collapse:collapse;font-size:.9rem;">' +
+      '<tr style="border-bottom:1px solid var(--gray-light);"><td style="padding:10px;font-weight:700;color:var(--navy);width:40%">Name</td><td style="padding:10px;">' + u.name + '</td></tr>' +
+      '<tr style="border-bottom:1px solid var(--gray-light);"><td style="padding:10px;font-weight:700;color:var(--navy);">Email</td><td style="padding:10px;">' + u.email + '</td></tr>' +
+      '<tr style="border-bottom:1px solid var(--gray-light);"><td style="padding:10px;font-weight:700;color:var(--navy);">Phone</td><td style="padding:10px;">' + u.phone + '</td></tr>' +
+      '<tr style="border-bottom:1px solid var(--gray-light);"><td style="padding:10px;font-weight:700;color:var(--navy);">Company</td><td style="padding:10px;">' + (u.company||'N/A') + '</td></tr>' +
+      '<tr style="border-bottom:1px solid var(--gray-light);"><td style="padding:10px;font-weight:700;color:var(--navy);">Registered</td><td style="padding:10px;">' + window.PC.formatDateTime(u.createdAt) + '</td></tr>' +
+      '<tr style="border-bottom:1px solid var(--gray-light);"><td style="padding:10px;font-weight:700;color:var(--navy);">Inquiries Made</td><td style="padding:10px;">' + userInquiries.length + '</td></tr>' +
+      '<tr><td style="padding:10px;font-weight:700;color:var(--navy);">Status</td><td style="padding:10px;"><span class="badge ' + ((u.status||'Active')==='Active'?'badge-success':'badge-danger') + '">' + (u.status||'Active') + '</span></td></tr>' +
+      '</table>';
+    document.getElementById('view-user-modal').classList.add('show');
+  };
+
+  window.closeUserModal = function() {
+    document.getElementById('view-user-modal').classList.remove('show');
+  };
+
+  window.toggleBlock = function(id) {
+    var users = window.PC.getUsers();
+    users = users.map(function(u){ if(u.id===id) u.status = (u.status||'Active')==='Active'?'Blocked':'Active'; return u; });
+    window.PC.saveUsers(users);
+    loadUsers();
+  };
+
+  loadUsers();
+}());
+</script>
+</body>
+</html>
+

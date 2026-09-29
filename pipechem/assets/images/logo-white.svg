@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 120" width="280" height="120">
+  <!-- Hexagon outline (flat-top) — white for dark backgrounds -->
+  <polygon points="75,10 100,24 100,68 75,82 50,68 50,24"
+           fill="none" stroke="#FFFFFF" stroke-width="2.8" stroke-linejoin="round"/>
+  <!-- Small benzene ring on top -->
+  <polygon points="75,4 78.5,6 78.5,10 75,12 71.5,10 71.5,6"
+           fill="none" stroke="#FFFFFF" stroke-width="1.6"/>
+  <!-- P letter inside hex -->
+  <path d="M57 35 L57 65 M57 35 L68 35 Q74 35 74 43 Q74 51 68 51 L57 51"
+        fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- C letter inside hex -->
+  <path d="M95 38 Q82 28 76 41 Q70 54 76 63 Q82 72 95 62"
+        fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" fill-opacity="0"/>
+  <!-- PIPE CHEM text -->
+  <text x="75" y="100" text-anchor="middle"
+        font-family="Georgia,Times New Roman,serif"
+        font-weight="900" font-size="19" fill="#FFFFFF" letter-spacing="5">PIPE CHEM</text>
+  <!-- Tagline -->
+  <text x="75" y="113" text-anchor="middle"
+        font-family="Georgia,Times New Roman,serif"
+        font-size="7.5" fill="rgba(255,255,255,0.65)" letter-spacing="2" font-weight="400">Reliable Chemical Sourcing</text>
+</svg>

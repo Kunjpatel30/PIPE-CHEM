@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — PIPE CHEM</title>
+  <link rel="icon" href="../assets/images/logo.png" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="admin-sidebar">
+    <div class="sidebar-logo">
+      <img src="../assets/images/logo.png" alt="PIPE CHEM">
+      <span>Admin Panel</span>
+    </div>
+    <nav class="sidebar-nav">
+      <p class="sidebar-section-label">Overview</p>
+      <a href="dashboard.html" class="sidebar-link active"><span class="s-icon">&#128200;</span> Dashboard</a>
+      <p class="sidebar-section-label">Management</p>
+      <a href="users.html" class="sidebar-link"><span class="s-icon">&#128101;</span> User Management</a>
+      <a href="inquiries.html" class="sidebar-link"><span class="s-icon">&#128203;</span> Inquiries <span class="badge" id="sb-inq-count">0</span></a>
+      <a href="appointments.html" class="sidebar-link"><span class="s-icon">&#128197;</span> Appointments</a>
+      <a href="reports.html" class="sidebar-link"><span class="s-icon">&#128220;</span> Reports</a>
+      <p class="sidebar-section-label">Website</p>
+      <a href="../index.html" class="sidebar-link" target="_blank"><span class="s-icon">&#127760;</span> View Website</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar">A</div>
+        <div class="user-info"><p class="name">Administrator</p><p class="role">PIPE CHEM Admin</p></div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">&#128682; Logout</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="topbar-left">
+        <span class="page-title">Dashboard</span>
+        <span class="page-sub" id="topbar-date">Loading...</span>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-date" id="topbar-time"></span>
+        <div class="topbar-notif" id="admin-notif-bell" title="Notifications" onclick="toggleAdminNotifPanel()" style="position:relative;cursor:pointer;">
+          <span>&#128276;</span>
+          <div class="notif-dot" id="notif-dot" style="display:none;"></div>
+          <span class="admin-bell-count" id="admin-bell-count" style="display:none;position:absolute;top:-6px;right:-6px;background:#E74C3C;color:#fff;font-size:.65rem;font-weight:700;border-radius:50%;width:17px;height:17px;line-height:17px;text-align:center;"></span>
+        </div>
+        <div class="admin-avatar">A</div>
+      </div>
+    </header>
+
+    <div class="admin-content">
+
+      <!-- Stats Cards -->
+      <div class="stats-cards" id="stat-cards">
+        <div class="stat-card">
+          <div class="stat-icon blue">&#128101;</div>
+          <div class="stat-info">
+            <div class="s-val" id="sc-users">0</div>
+            <div class="s-lbl">Registered Users</div>
+            <div class="s-change up" id="sc-users-ch"></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon gold">&#128203;</div>
+          <div class="stat-info">
+            <div class="s-val" id="sc-inq">0</div>
+            <div class="s-lbl">Total Inquiries</div>
+            <div class="s-change up" id="sc-inq-ch"></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">&#128197;</div>
+          <div class="stat-info">
+            <div class="s-val" id="sc-appt">0</div>
+            <div class="s-lbl">Appointments</div>
+            <div class="s-change up" id="sc-appt-ch"></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red">&#9203;</div>
+          <div class="stat-info">
+            <div class="s-val" id="sc-pending">0</div>
+            <div class="s-lbl">Pending Inquiries</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <a href="users.html" class="quick-card"><div class="q-icon">&#128101;</div><p>Manage Users</p></a>
+        <a href="inquiries.html" class="quick-card"><div class="q-icon">&#128203;</div><p>View Inquiries</p></a>
+        <a href="appointments.html" class="quick-card"><div class="q-icon">&#128197;</div><p>Appointments</p></a>
+        <a href="reports.html" class="quick-card"><div class="q-icon">&#128220;</div><p>View Reports</p></a>
+      </div>
+
+      <!-- Dashboard Grid -->
+      <div class="dash-grid">
+        <!-- Recent Inquiries -->
+        <div class="admin-panel dash-full">
+          <div class="admin-panel-header">
+            <div><div class="panel-title">Recent Inquiries</div><div class="panel-sub">Latest chemical supply requests from customers</div></div>
+            <div class="panel-actions"><a href="inquiries.html" class="btn-sm btn-sm-primary">View All</a></div>
+          </div>
+          <div class="admin-panel-body" style="padding:0;">
+            <div class="table-responsive" style="overflow-x:auto;">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>ID</th><th>Customer</th><th>Chemical</th><th>Quantity</th><th>Price</th><th>Type</th><th>Date</th><th>Status</th><th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-inq-tbody">
+                  <tr><td colspan="9" style="text-align:center;padding:30px;color:var(--gray);">No inquiries yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Appointments -->
+        <div class="admin-panel">
+          <div class="admin-panel-header">
+            <div><div class="panel-title">Upcoming Appointments</div><div class="panel-sub">Scheduled customer meetings</div></div>
+            <div class="panel-actions">
+              <button class="btn-primary-admin" onclick="openApptModal()">&#43; Add Appointment</button>
+            </div>
+          </div>
+          <div class="admin-panel-body" id="upcoming-appts">
+            <p style="color:var(--gray);font-size:.88rem;text-align:center;padding:20px;">No upcoming appointments.</p>
+          </div>
+        </div>
+
+        <!-- Recent Users -->
+        <div class="admin-panel">
+          <div class="admin-panel-header">
+            <div><div class="panel-title">Recent Registrations</div><div class="panel-sub">Newly registered users</div></div>
+            <div class="panel-actions"><a href="users.html" class="btn-sm btn-sm-primary">View All</a></div>
+          </div>
+          <div class="admin-panel-body" style="padding:0;">
+            <table class="admin-table">
+              <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Date</th><th>Status</th></tr></thead>
+              <tbody id="recent-users-tbody">
+                <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--gray);">No users registered.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Appointment Modal -->
+<div class="modal-overlay" id="appt-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title">&#128197; Schedule Appointment</h3>
+      <button class="modal-close" onclick="closeApptModal()">&#10005;</button>
+    </div>
+    <form id="appt-form" novalidate>
+      <div class="form-row-admin">
+        <div class="admin-form-group">
+          <label class="admin-label" for="am-customer">Customer Name *</label>
+          <input type="text" id="am-customer" class="admin-input" placeholder="Customer name" required>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-label" for="am-phone">Phone Number</label>
+          <input type="tel" id="am-phone" class="admin-input" placeholder="+91 XXXXX XXXXX">
+        </div>
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-label" for="am-date">Date &amp; Time *</label>
+        <input type="datetime-local" id="am-date" class="admin-input" required>
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-label" for="am-purpose">Purpose / Agenda *</label>
+        <input type="text" id="am-purpose" class="admin-input" placeholder="e.g., Product discussion, pricing, site visit..." required>
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-label" for="am-note">Additional Notes</label>
+        <textarea id="am-note" class="admin-input" rows="2" placeholder="Any additional notes..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-sm btn-sm-danger" onclick="closeApptModal()">Cancel</button>
+        <button type="submit" class="btn-gold-admin">&#9989; Save Appointment</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="../assets/js/components.js"></script>
+<script>
+(function () {
+  /* Auth guard */
+  if (window.PC && !window.PC.isAdminLoggedIn()) { window.location.replace('./login.html'); return; }
+
+  /* Date/Time */
+  function updateTime() {
+    var now = new Date();
+    document.getElementById('topbar-date').textContent = now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    document.getElementById('topbar-time').textContent = now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  }
+  updateTime();
+  setInterval(updateTime, 1000);
+
+  /* Load stats */
+  function loadDashboard() {
+    var users = window.PC.getUsers();
+    var inquiries = window.PC.getInquiries();
+    var appts = window.PC.getAppointments();
+    var pending = inquiries.filter(function(i){return i.status==='Pending';});
+
+    document.getElementById('sc-users').textContent = users.length;
+    document.getElementById('sc-inq').textContent = inquiries.length;
+    document.getElementById('sc-appt').textContent = appts.length;
+    document.getElementById('sc-pending').textContent = pending.length;
+    document.getElementById('sb-inq-count').textContent = inquiries.length;
+
+    /* Update notification bell */
+    var adminNotifs = window.PC.getAdminNotifications();
+    var unreadNotifs = adminNotifs.filter(function(n){ return !n.read; });
+    var bellCount = document.getElementById('admin-bell-count');
+    if (bellCount) {
+      if (unreadNotifs.length > 0) {
+        bellCount.textContent = unreadNotifs.length > 9 ? '9+' : unreadNotifs.length;
+        bellCount.style.display = 'block';
+        document.getElementById('notif-dot').style.display = 'block';
+      } else {
+        bellCount.style.display = 'none';
+        document.getElementById('notif-dot').style.display = 'none';
+      }
+    } else if (pending.length > 0) {
+      document.getElementById('notif-dot').style.display = 'block';
+    }
+
+    /* Recent inquiries */
+    var tbody = document.getElementById('recent-inq-tbody');
+    var recent = inquiries.slice(-6).reverse();
+    if (recent.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--gray);">No inquiries yet.</td></tr>';
+    } else {
+      tbody.innerHTML = recent.map(function(i){
+        var statusClass = i.status === 'Pending' ? 'badge-warning' : i.status === 'Resolved' ? 'badge-success' : 'badge-info';
+        return '<tr>' +
+          '<td><strong>' + i.id + '</strong></td>' +
+          '<td>' + i.name + '<br><small style="color:var(--gray)">' + i.phone + '</small></td>' +
+          '<td>' + i.chemical + '</td>' +
+          '<td>' + i.quantity + '</td>' +
+          '<td>' + i.expectedPrice + '</td>' +
+          '<td><span class="badge badge-navy">' + i.deliveryType + '</span></td>' +
+          '<td>' + window.PC.formatDate(i.createdAt) + '</td>' +
+          '<td><span class="badge ' + statusClass + '">' + i.status + '</span></td>' +
+          '<td><button class="btn-sm btn-sm-success" onclick="markResolved(\'' + i.id + '\')">Resolve</button></td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    /* Upcoming appointments */
+    var now = new Date();
+    var upcoming = appts.filter(function(a){ return new Date(a.datetime) >= now; }).sort(function(a,b){ return new Date(a.datetime)-new Date(b.datetime); }).slice(0,4);
+    var apptEl = document.getElementById('upcoming-appts');
+    if (upcoming.length === 0) {
+      apptEl.innerHTML = '<p style="color:var(--gray);font-size:.88rem;text-align:center;padding:20px 0;">No upcoming appointments.</p>';
+    } else {
+      apptEl.innerHTML = upcoming.map(function(a){
+        return '<div class="appt-slot">' +
+          '<div><div class="appt-time">' + new Date(a.datetime).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) + '</div>' +
+          '<div style="font-size:.72rem;color:var(--gray);">' + new Date(a.datetime).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) + '</div></div>' +
+          '<div class="appt-info"><div class="appt-customer">' + a.customer + '</div><div class="appt-note">' + a.purpose + '</div></div>' +
+          '<div class="appt-status"><span class="badge badge-info">' + (a.status || 'Scheduled') + '</span></div>' +
+          '</div>';
+      }).join('');
+    }
+
+    /* Recent users */
+    var utbody = document.getElementById('recent-users-tbody');
+    var recentUsers = users.slice(-5).reverse();
+    if (recentUsers.length === 0) {
+      utbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--gray);">No users registered.</td></tr>';
+    } else {
+      utbody.innerHTML = recentUsers.map(function(u){
+        return '<tr>' +
+          '<td><strong>' + u.name + '</strong></td>' +
+          '<td>' + u.email + '</td>' +
+          '<td>' + u.phone + '</td>' +
+          '<td>' + window.PC.formatDate(u.createdAt) + '</td>' +
+          '<td><span class="badge badge-success">' + (u.status||'Active') + '</span></td>' +
+          '</tr>';
+      }).join('');
+    }
+  }
+  loadDashboard();
+
+  /* Mark resolved */
+  window.markResolved = function(id) {
+    var inquiries = window.PC.getInquiries();
+    inquiries = inquiries.map(function(i){ if(i.id===id) i.status='Resolved'; return i; });
+    window.PC.saveInquiries(inquiries);
+    loadDashboard();
+  };
+
+  /* Appointment Modal */
+  window.openApptModal = function() {
+    document.getElementById('appt-modal').classList.add('show');
+    /* Set min date to now */
+    var now = new Date();
+    var tzOffset = now.getTimezoneOffset() * 60000;
+    document.getElementById('am-date').min = new Date(now - tzOffset).toISOString().slice(0,16);
+  };
+  window.closeApptModal = function() {
+    document.getElementById('appt-modal').classList.remove('show');
+    document.getElementById('appt-form').reset();
+  };
+  document.getElementById('appt-modal').addEventListener('click', function(e){ if(e.target===this) closeApptModal(); });
+
+  document.getElementById('appt-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var customer = document.getElementById('am-customer').value.trim();
+    var phone    = document.getElementById('am-phone').value.trim();
+    var datetime = document.getElementById('am-date').value;
+    var purpose  = document.getElementById('am-purpose').value.trim();
+    var note     = document.getElementById('am-note').value.trim();
+    if (!customer || !datetime || !purpose) {
+      showToast('Please fill required fields.', 'error'); return;
+    }
+    var appts = window.PC.getAppointments();
+    appts.push({ id: window.PC.generateId(), customer: customer, phone: phone, datetime: datetime, purpose: purpose, note: note, status: 'Scheduled', createdAt: new Date().toISOString() });
+    window.PC.saveAppointments(appts);
+    closeApptModal();
+    loadDashboard();
+    showToast('Appointment scheduled successfully!', 't-success');
+  });
+
+  function showToast(msg, type) {
+    var t = document.createElement('div');
+    t.className = 'toast ' + type + ' show';
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;transform:translateX(0);';
+    document.body.appendChild(t);
+    setTimeout(function(){ t.remove(); }, 3000);
+  }
+
+  /* ── Admin Notification Panel ── */
+  window.toggleAdminNotifPanel = function() {
+    var panel = document.getElementById('admin-notif-panel');
+    if (!panel) return;
+    var isOpen = panel.classList.toggle('open');
+    if (isOpen) {
+      renderAdminNotifs();
+      window.PC.clearAllAdminNotifs();
+      setTimeout(function(){
+        var bc = document.getElementById('admin-bell-count');
+        if (bc) bc.style.display = 'none';
+        var nd = document.getElementById('notif-dot');
+        if (nd) nd.style.display = 'none';
+      }, 500);
+    }
+  };
+
+  function renderAdminNotifs() {
+    var notifs = window.PC.getAdminNotifications();
+    var list   = document.getElementById('admin-notif-list');
+    if (!list) return;
+    if (!notifs.length) {
+      list.innerHTML = '<div style="padding:24px;text-align:center;color:rgba(255,255,255,.4);">No notifications yet.</div>';
+      return;
+    }
+    var icons = { inquiry:'&#128203;', inquiry_update:'&#128257;', registration:'&#128101;', appointment:'&#128197;', contact:'&#128231;' };
+    list.innerHTML = notifs.slice(0, 20).map(function(n){
+      return '<div class="admin-notif-item' + (n.read ? '' : ' unread') + '">' +
+        '<div class="notif-icon">' + (icons[n.type] || '&#128276;') + '</div>' +
+        '<div class="notif-content">' +
+          '<div class="notif-title">' + n.title + '</div>' +
+          '<div class="notif-body">' + n.body + '</div>' +
+          '<div class="notif-time">' + window.PC.formatDateTime(n.createdAt) + '</div>' +
+        '</div></div>';
+    }).join('');
+  }
+
+  /* Close notif panel on outside click */
+  document.addEventListener('click', function(e) {
+    var panel = document.getElementById('admin-notif-panel');
+    var bell  = document.getElementById('admin-notif-bell');
+    if (panel && panel.classList.contains('open') && !panel.contains(e.target) && (!bell || !bell.contains(e.target))) {
+      panel.classList.remove('open');
+    }
+  });
+
+  window.doLogout = function() {
+    window.PC.adminLogout();
+    window.location.replace('./login.html');
+  };
+}());
+</script>
+
+<!-- Admin Notification Slide Panel -->
+<div id="admin-notif-panel" style="position:fixed;top:0;right:-360px;width:340px;height:100vh;background:var(--navy-dark,#111C30);z-index:10000;box-shadow:-4px 0 24px rgba(0,0,0,.35);transition:right .3s cubic-bezier(.25,.8,.25,1);overflow:hidden;display:flex;flex-direction:column;">
+  <div style="padding:20px 18px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;">
+    <h4 style="color:#fff;margin:0;font-size:.95rem;font-weight:700;">&#128276; Notifications</h4>
+    <button onclick="document.getElementById('admin-notif-panel').classList.remove('open')" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:1.2rem;cursor:pointer;">&#10005;</button>
+  </div>
+  <div id="admin-notif-list" style="flex:1;overflow-y:auto;padding:8px 0;"></div>
+</div>
+
+<style>
+  #admin-notif-panel.open { right: 0; }
+  .admin-notif-item { display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.05);transition:background .2s; }
+  .admin-notif-item.unread { background:rgba(201,168,76,.06); }
+  .admin-notif-item:hover { background:rgba(255,255,255,.04); }
+  .admin-notif-item .notif-icon { font-size:1.4rem;flex-shrink:0;width:32px;text-align:center;padding-top:2px; }
+  .admin-notif-item .notif-content .notif-title { color:#fff;font-size:.82rem;font-weight:700;margin-bottom:3px; }
+  .admin-notif-item .notif-content .notif-body  { color:rgba(255,255,255,.55);font-size:.78rem;line-height:1.5;margin-bottom:4px; }
+  .admin-notif-item .notif-content .notif-time  { color:rgba(255,255,255,.3);font-size:.7rem; }
+  /* Header user area */
+  .header-user-btn { display:flex;align-items:center;gap:6px;background:rgba(27,42,74,.08);border:1.5px solid rgba(27,42,74,.15);border-radius:100px;padding:5px 12px 5px 8px;text-decoration:none;color:var(--navy);font-size:.82rem;font-weight:700;position:relative;transition:background .2s; }
+  .header-user-btn:hover { background:rgba(27,42,74,.14); }
+  .header-user-btn .header-user-icon { font-size:1rem; }
+  .header-notif-badge { background:#E74C3C;color:#fff;font-size:.6rem;font-weight:800;border-radius:50%;width:16px;height:16px;line-height:16px;text-align:center;display:inline-block; }
+  .header-right { display:flex;align-items:center;gap:12px; }
+  .nav-notif-dot { background:#E74C3C;color:#fff;font-size:.6rem;font-weight:800;border-radius:50%;width:16px;height:16px;line-height:16px;text-align:center;display:inline-flex;align-items:center;justify-content:center;margin-left:4px; }
+  .nav-user-info { display:flex;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:14px; }
+  .nav-user-avatar { width:40px;height:40px;background:var(--gold);color:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;flex-shrink:0; }
+</style>
+</body>
+</html>
+
+

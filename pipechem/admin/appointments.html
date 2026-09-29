@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appointments — PIPE CHEM Admin</title>
+  <link rel="icon" href="../assets/images/logo.png" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="sidebar-logo"><img src="../assets/images/logo.png" alt="PIPE CHEM"><span>Admin Panel</span></div>
+    <nav class="sidebar-nav">
+      <p class="sidebar-section-label">Overview</p>
+      <a href="dashboard.html" class="sidebar-link"><span class="s-icon">&#128200;</span> Dashboard</a>
+      <p class="sidebar-section-label">Management</p>
+      <a href="users.html" class="sidebar-link"><span class="s-icon">&#128101;</span> User Management</a>
+      <a href="inquiries.html" class="sidebar-link"><span class="s-icon">&#128203;</span> Inquiries</a>
+      <a href="appointments.html" class="sidebar-link active"><span class="s-icon">&#128197;</span> Appointments</a>
+      <a href="reports.html" class="sidebar-link"><span class="s-icon">&#128220;</span> Reports</a>
+      <p class="sidebar-section-label">Website</p>
+      <a href="../index.html" class="sidebar-link" target="_blank"><span class="s-icon">&#127760;</span> View Website</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user"><div class="avatar">A</div><div class="user-info"><p class="name">Administrator</p><p class="role">PIPE CHEM Admin</p></div></div>
+      <button class="btn-logout" onclick="window.PC.adminLogout();window.location.replace('./login.html');">&#128682; Logout</button>
+    </div>
+  </aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="topbar-left"><span class="page-title">Appointment Panel</span><span class="page-sub">Schedule and manage customer appointments</span></div>
+      <div class="topbar-right">
+        <button class="btn-gold-admin" onclick="openModal()">&#43; New Appointment</button>
+        <div class="admin-avatar">A</div>
+      </div>
+    </header>
+    <div class="admin-content">
+
+      <!-- Stats -->
+      <div class="stats-cards" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card"><div class="stat-icon green">&#128197;</div><div class="stat-info"><div class="s-val" id="a-total">0</div><div class="s-lbl">Total Appointments</div></div></div>
+        <div class="stat-card"><div class="stat-icon blue">&#8987;</div><div class="stat-info"><div class="s-val" id="a-upcoming">0</div><div class="s-lbl">Upcoming</div></div></div>
+        <div class="stat-card"><div class="stat-icon gold">&#9989;</div><div class="stat-info"><div class="s-val" id="a-done">0</div><div class="s-lbl">Completed</div></div></div>
+      </div>
+
+      <!-- Calendar Strip (Today's Appointments) -->
+      <div class="admin-panel" style="margin-bottom:24px;">
+        <div class="admin-panel-header">
+          <div><div class="panel-title">Today's Schedule</div><div class="panel-sub" id="today-label"></div></div>
+        </div>
+        <div class="admin-panel-body" id="today-appts">
+          <p style="color:var(--gray);font-size:.88rem;text-align:center;">No appointments today.</p>
+        </div>
+      </div>
+
+      <!-- All Appointments Table -->
+      <div class="admin-panel">
+        <div class="admin-panel-header">
+          <div><div class="panel-title">All Appointments</div><div class="panel-sub" id="appt-count-label"></div></div>
+          <div class="panel-actions">
+            <select id="appt-filter" class="admin-input" style="width:160px;" onchange="filterAppts()">
+              <option value="">All Status</option>
+              <option value="Scheduled">Scheduled</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead>
+              <tr><th>#</th><th>Customer</th><th>Phone</th><th>Date &amp; Time</th><th>Purpose</th><th>Notes</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="appts-tbody">
+              <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--gray);">No appointments found.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Appointment Modal -->
+<div class="modal-overlay" id="appt-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title">&#128197; Schedule Appointment</h3>
+      <button class="modal-close" onclick="closeModal()">&#10005;</button>
+    </div>
+    <form id="appt-form" novalidate>
+      <div class="form-row-admin">
+        <div class="admin-form-group">
+          <label class="admin-label">Customer Name *</label>
+          <input type="text" id="am-customer" class="admin-input" placeholder="Customer name" required>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-label">Phone</label>
+          <input type="tel" id="am-phone" class="admin-input" placeholder="+91 XXXXX XXXXX">
+        </div>
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-label">Date &amp; Time *</label>
+        <input type="datetime-local" id="am-date" class="admin-input" required>
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-label">Purpose / Agenda *</label>
+        <input type="text" id="am-purpose" class="admin-input" placeholder="e.g., Product discussion, pricing review..." required>
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-label">Additional Notes</label>
+        <textarea id="am-note" class="admin-input" rows="2" placeholder="Any additional notes or requirements..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-sm btn-sm-danger" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn-gold-admin">&#9989; Save Appointment</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="../assets/js/components.js"></script>
+<script>
+(function () {
+  if (!window.PC.isAdminLoggedIn()) { window.location.replace('./login.html'); return; }
+  var allAppts = [];
+
+  function loadAppts() {
+    allAppts = window.PC.getAppointments().sort(function(a,b){ return new Date(b.datetime)-new Date(a.datetime); });
+    var now = new Date();
+    var upcoming  = allAppts.filter(function(a){ return new Date(a.datetime) > now && a.status !== 'Cancelled'; }).length;
+    var completed = allAppts.filter(function(a){ return a.status === 'Completed'; }).length;
+    document.getElementById('a-total').textContent    = allAppts.length;
+    document.getElementById('a-upcoming').textContent = upcoming;
+    document.getElementById('a-done').textContent     = completed;
+
+    /* Today's appointments */
+    var today = now.toDateString();
+    document.getElementById('today-label').textContent = today;
+    var todayAppts = allAppts.filter(function(a){ return new Date(a.datetime).toDateString() === today; });
+    var todayEl = document.getElementById('today-appts');
+    if (!todayAppts.length) {
+      todayEl.innerHTML = '<p style="color:var(--gray);font-size:.88rem;text-align:center;">No appointments scheduled for today.</p>';
+    } else {
+      todayEl.innerHTML = todayAppts.map(function(a){
+        var sClass = a.status==='Completed'?'badge-success':a.status==='Cancelled'?'badge-danger':'badge-info';
+        return '<div class="appt-slot">' +
+          '<div><div class="appt-time">' + new Date(a.datetime).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) + '</div></div>' +
+          '<div class="appt-info"><div class="appt-customer">' + a.customer + ' &mdash; ' + (a.phone||'No phone') + '</div>' +
+          '<div class="appt-note">' + a.purpose + (a.note ? ' | ' + a.note : '') + '</div></div>' +
+          '<div class="appt-status"><span class="badge ' + sClass + '">' + (a.status||'Scheduled') + '</span></div>' +
+          '</div>';
+      }).join('');
+    }
+    renderAppts(allAppts);
+  }
+
+  function renderAppts(arr) {
+    document.getElementById('appt-count-label').textContent = 'Showing ' + arr.length + ' appointment(s)';
+    var tbody = document.getElementById('appts-tbody');
+    if (!arr.length) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--gray);">No appointments found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = arr.map(function(a, i){
+      var sClass = a.status==='Completed'?'badge-success':a.status==='Cancelled'?'badge-danger':'badge-info';
+      return '<tr>' +
+        '<td>' + (i+1) + '</td>' +
+        '<td><strong>' + a.customer + '</strong></td>' +
+        '<td>' + (a.phone||'&#8212;') + '</td>' +
+        '<td>' + new Date(a.datetime).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) + '</td>' +
+        '<td>' + a.purpose + '</td>' +
+        '<td style="max-width:140px;font-size:.84rem;">' + (a.note||'&#8212;') + '</td>' +
+        '<td><span class="badge ' + sClass + '">' + (a.status||'Scheduled') + '</span></td>' +
+        '<td style="display:flex;gap:5px;">' +
+          '<button class="btn-sm btn-sm-success" onclick="setStatus(\'' + a.id + '\',\'Completed\')">Done</button>' +
+          '<button class="btn-sm btn-sm-danger" onclick="setStatus(\'' + a.id + '\',\'Cancelled\')">Cancel</button>' +
+          '<button class="btn-sm btn-sm-danger" style="background:rgba(231,76,60,.05);" onclick="deleteAppt(\'' + a.id + '\')">&#128465;</button>' +
+        '</td></tr>';
+    }).join('');
+  }
+
+  window.filterAppts = function() {
+    var st = document.getElementById('appt-filter').value;
+    renderAppts(st ? allAppts.filter(function(a){ return (a.status||'Scheduled')===st; }) : allAppts);
+  };
+
+  window.setStatus = function(id, status) {
+    var appts = window.PC.getAppointments().map(function(a){ if(a.id===id) a.status=status; return a; });
+    window.PC.saveAppointments(appts);
+    loadAppts();
+  };
+
+  window.deleteAppt = function(id) {
+    if (!confirm('Delete this appointment?')) return;
+    var appts = window.PC.getAppointments().filter(function(a){ return a.id!==id; });
+    window.PC.saveAppointments(appts);
+    loadAppts();
+  };
+
+  window.openModal = function() {
+    document.getElementById('appt-form').reset();
+    var now = new Date();
+    var tzOffset = now.getTimezoneOffset() * 60000;
+    document.getElementById('am-date').min = new Date(now - tzOffset).toISOString().slice(0,16);
+    document.getElementById('appt-modal').classList.add('show');
+  };
+  window.closeModal = function() {
+    document.getElementById('appt-modal').classList.remove('show');
+  };
+  document.getElementById('appt-modal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+
+  document.getElementById('appt-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var customer = document.getElementById('am-customer').value.trim();
+    var phone    = document.getElementById('am-phone').value.trim();
+    var datetime = document.getElementById('am-date').value;
+    var purpose  = document.getElementById('am-purpose').value.trim();
+    var note     = document.getElementById('am-note').value.trim();
+    if (!customer || !datetime || !purpose) return;
+
+    var apptId = window.PC.generateId();
+    var appts  = window.PC.getAppointments();
+    appts.push({ id: apptId, customer: customer, phone: phone, datetime: datetime, purpose: purpose, note: note, status: 'Scheduled', createdAt: new Date().toISOString() });
+    window.PC.saveAppointments(appts);
+
+    /* ── Notify the user if we can find them by phone or name ── */
+    var users = window.PC.getUsers();
+    var matchedUser = users.find(function(u){
+      return (phone && u.phone === phone) || u.name.toLowerCase() === customer.toLowerCase();
+    });
+    if (matchedUser) {
+      var apptDate = new Date(datetime).toLocaleString('en-IN', {
+        weekday:'long', day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'
+      });
+      window.PC.addUserNotification(
+        matchedUser.id,
+        'appointment',
+        '&#128197; Appointment Scheduled',
+        'PIPE CHEM has scheduled an appointment for you on ' + apptDate + '. Purpose: ' + purpose + (note ? ' | Note: ' + note : ''),
+        apptId
+      );
+    }
+
+    /* Admin notification log */
+    window.PC.addAdminNotification(
+      'appointment',
+      'Appointment Scheduled: ' + customer,
+      purpose + ' — ' + new Date(datetime).toLocaleDateString('en-IN'),
+      apptId
+    );
+
+    closeModal();
+    loadAppts();
+  });
+
+  loadAppts();
+}());
+</script>
+</body>
+</html>
+
