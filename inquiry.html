@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inquiry — PIPE CHEM | Request Chemical Pricing &amp; Supply</title>
+  <meta name="description"
+    content="Submit a chemical supply inquiry to PIPE CHEM. Get competitive pricing for industrial chemicals with Ex-Plant or Delivered pricing options.">
+  <link rel="icon" href="./assets/images/logo.png" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+
+<body>
+  <div id="header-inject"></div>
+  <section class="page-hero">
+    <div class="container page-hero-content">
+      <h1>Submit an Inquiry</h1>
+      <div class="breadcrumb"><a href="./index.html">Home</a><span
+          class="breadcrumb-sep">&#8250;</span><span>Inquiry</span></div>
+    </div>
+  </section>
+
+  <section class="inquiry-page section-pad">
+    <div class="container">
+      <div class="inquiry-layout">
+
+        <!-- Form Card -->
+        <div class="inquiry-form-card">
+          <h2>Chemical Supply Inquiry</h2>
+          <p class="sub">Fill in the details below and our team will respond with a competitive quotation within 24
+            hours.</p>
+
+          <!-- Success message (hidden by default) -->
+          <div id="inq-success-msg" style="display:none;text-align:center;padding:40px 24px;">
+            <div style="font-size:3.5rem;margin-bottom:16px;">&#9989;</div>
+            <h3 style="color:var(--navy);margin-bottom:10px;">Inquiry Submitted!</h3>
+            <p style="color:var(--text-secondary);max-width:400px;margin:0 auto 24px;">Thank you! Our team will review
+              your requirement and contact you within 24 business hours.</p>
+            <button onclick="resetInquiryForm()" class="btn btn-navy">&#43; Submit Another Inquiry</button>
+          </div>
+
+          <form id="inquiry-form" novalidate>
+            <!-- Name + Phone -->
+            <div class="input-row">
+              <div class="form-group">
+                <label class="form-label" for="inq-name">Full Name <span class="req">*</span></label>
+                <input type="text" id="inq-name" class="form-control" placeholder="Your name" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="inq-phone">Phone Number <span class="req">*</span></label>
+                <input type="tel" id="inq-phone" class="form-control" placeholder="+91 XXXXX XXXXX" required>
+              </div>
+            </div>
+
+            <!-- Email + Company -->
+            <div class="input-row">
+              <div class="form-group">
+                <label class="form-label" for="inq-email">Email Address <span class="req">*</span></label>
+                <input type="email" id="inq-email" class="form-control" placeholder="you@company.com" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="inq-company">Company / Firm Name <span class="req">*</span></label>
+                <input type="text" id="inq-company" class="form-control" placeholder="Your company name" required>
+              </div>
+            </div>
+
+            <!-- Chemical Dropdown -->
+            <div class="form-group">
+              <label class="form-label" for="inq-chemical">Chemical Name <span class="req">*</span></label>
+              <select id="inq-chemical" class="form-control" required>
+                <option value="">-- Select Chemical --</option>
+                <option value="Hydrochloric Acid (HCl) 30-32%">Hydrochloric Acid (HCl) &#8211; 30&#8211;32%</option>
+                <option value="Dilute Sulphuric Acid 70-74%">Dilute Sulphuric Acid &#8211; 70&#8211;74%</option>
+                <option value="Dilute Nitric Acid 24%">Dilute Nitric Acid &#8211; 24%</option>
+                <option value="Sodium Sulphate 93-99%">Sodium Sulphate &#8211; 93&#8211;99%</option>
+                <option value="Phosphoric Acid 78%">Phosphoric Acid &#8211; 78%</option>
+                <option value="Sodium Hypochlorite 10-12%">Sodium Hypochlorite &#8211; 10&#8211;12%</option>
+                <option value="Ferric Alum">Ferric Alum (Alumino-Ferric)</option>
+                <option value="Speciality Chemicals">Speciality Chemicals</option>
+                <option value="Spent Solvents">Spent Solvents</option>
+                <option value="Other">Other (Specify in Remarks)</option>
+              </select>
+            </div>
+
+            <!-- Quantity + Expected Price -->
+            <div class="input-row">
+              <div class="form-group">
+                <label class="form-label" for="inq-qty">Required Quantity <span class="req">*</span></label>
+                <div class="input-addon-wrap">
+                  <span class="input-addon">MT</span>
+                  <input type="number" id="inq-qty" class="form-control" placeholder="e.g. 5" min="0.1" step="0.1"
+                    required>
+                </div>
+                <p class="form-hint">Metric Tonnes (MT) per order / per month</p>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="inq-price">Expected Price <span class="req">*</span></label>
+                <div class="input-addon-wrap">
+                  <span class="input-addon">&#8377; / MT</span>
+                  <input type="number" id="inq-price" class="form-control" placeholder="e.g. 12000" min="0" required>
+                </div>
+                <p class="form-hint">Expected price per metric tonne in INR</p>
+              </div>
+            </div>
+
+            <!-- Delivery Type -->
+            <div class="form-group">
+              <label class="form-label">Delivery Type <span class="req">*</span></label>
+              <div class="radio-opts">
+                <label class="radio-opt" for="type-exPlant">
+                  <input type="radio" id="type-exPlant" name="delivery-type" value="Ex-Plant" required>
+                  &#127981; Ex-Plant
+                </label>
+                <label class="radio-opt" for="type-delivered">
+                  <input type="radio" id="type-delivered" name="delivery-type" value="Delivered">
+                  &#128666; Delivered to Location
+                </label>
+              </div>
+            </div>
+
+            <!-- Location (shows only for Delivered) -->
+            <div class="form-group location-reveal" id="location-field">
+              <label class="form-label" for="inq-location">Delivery Location <span class="req">*</span></label>
+              <input type="text" id="inq-location" class="form-control" placeholder="City, State / Full Address">
+              <p class="form-hint">Enter the city, state, or full delivery address where chemicals are to be delivered.
+              </p>
+            </div>
+
+            <!-- Remarks -->
+            <div class="form-group">
+              <label class="form-label" for="inq-remarks">Additional Requirements / Remarks</label>
+              <textarea id="inq-remarks" class="form-control" rows="3"
+                placeholder="Specify grade, packaging preference, purity requirements, frequency of supply, or any other details..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit-inquiry" id="inq-submit">
+              <span id="inq-btn-text">&#128203; Submit Inquiry</span>
+              <span id="inq-btn-spinner" style="display:none;">&#8987; Submitting...</span>
+            </button>
+            <p style="font-size:.75rem;color:var(--gray);margin-top:12px;text-align:center;">Your information is
+              confidential and will only be used to prepare a quotation for you.</p>
+          </form>
+        </div>
+
+        <!-- Info Column -->
+        <div class="inquiry-info-col">
+          <div class="inq-info-card">
+            <h3>&#128222; Contact Us Directly</h3>
+            <div class="inq-contact-row">
+              <div class="ico">&#128222;</div>
+              <span>+91 9558821244</span>
+            </div>
+            <div class="inq-contact-row">
+              <div class="ico">&#128222;</div>
+              <span>+91 9558821243</span>
+            </div>
+            <div class="inq-contact-row">
+              <div class="ico">&#128172;</div>
+              <span>+91 78629 84082 (WhatsApp)</span>
+            </div>
+            <div class="inq-contact-row">
+              <div class="ico">&#128231;</div>
+              <span>pipechem2004@gmail.com</span>
+            </div>
+          </div>
+          <div class="inq-info-card">
+            <h3>&#128336; Our Response Time</h3>
+            <p>We typically respond to all inquiries within <strong style="color:var(--gold-light);">24 business
+                hours</strong>. For urgent requirements, please call us directly.</p>
+          </div>
+          <div class="inq-info-card">
+            <h3>&#9989; What to Expect</h3>
+            <p style="margin-bottom:8px;">After receiving your inquiry, our team will:</p>
+            <ul style="list-style:none;">
+              <li style="color:rgba(255,255,255,.6);font-size:.88rem;padding:5px 0;">&#8250; Review your chemical
+                requirements</li>
+              <li style="color:rgba(255,255,255,.6);font-size:.88rem;padding:5px 0;">&#8250; Check stock and supply
+                availability</li>
+              <li style="color:rgba(255,255,255,.6);font-size:.88rem;padding:5px 0;">&#8250; Prepare a competitive
+                quotation</li>
+              <li style="color:rgba(255,255,255,.6);font-size:.88rem;padding:5px 0;">&#8250; Contact you via phone or
+                email</li>
+            </ul>
+          </div>
+          <div class="inq-info-card">
+            <h3>&#128665; Ex-Plant vs. Delivered</h3>
+            <p><strong style="color:var(--gold-light);">Ex-Plant:</strong> Price at manufacturer's plant gate — you
+              arrange your own transportation.<br><br><strong style="color:var(--gold-light);">Delivered:</strong> Price
+              includes freight and delivery to your specified location in India.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-inject"></div>
+
+  <script src="./assets/js/components.js"></script>
+  <script>
+    /*
+      ===================================================================
+      EMAIL SETUP — Web3Forms (Free, no backend needed)
+      ===================================================================
+      STEP 1: Go to https://web3forms.com/
+      STEP 2: Enter "pipechem2004@gmail.com" and click "Create Access Key"
+      STEP 3: Check your Gmail inbox and confirm the activation email
+      STEP 4: Copy the Access Key and paste it below replacing
+              "3686547b-9347-4a57-8d0e-06441ccd5b53"
+      ===================================================================
+    */
+    var WEB3FORMS_KEY = '3686547b-9347-4a57-8d0e-06441ccd5b53';
+
+    (function () {
+
+      /* ── Pre-select chemical from URL params ── */
+      document.addEventListener('DOMContentLoaded', function () {
+        var urlParams = new URLSearchParams(window.location.search);
+        var chemParam = urlParams.get('product');
+        if (chemParam) {
+          var sel = document.getElementById('inq-chemical');
+          if (sel) {
+            for (var i = 0; i < sel.options.length; i++) {
+              if (sel.options[i].value.toLowerCase().includes(chemParam.toLowerCase())) {
+                sel.selectedIndex = i;
+                break;
+              }
+            }
+          }
+        }
+      });
+
+      /* ── Delivery type toggle ── */
+      var radios = document.querySelectorAll('input[name="delivery-type"]');
+      var locationField = document.getElementById('location-field');
+      var locationInput = document.getElementById('inq-location');
+
+      radios.forEach(function (r) {
+        r.addEventListener('change', function () {
+          if (this.value === 'Delivered') {
+            locationField.classList.add('show');
+            locationInput.required = true;
+          } else {
+            locationField.classList.remove('show');
+            locationInput.required = false;
+            locationInput.value = '';
+          }
+        });
+      });
+
+      /* ── Form submission ── */
+      var form = document.getElementById('inquiry-form');
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var name = document.getElementById('inq-name').value.trim();
+        var phone = document.getElementById('inq-phone').value.trim();
+        var email = document.getElementById('inq-email').value.trim();
+        var company = document.getElementById('inq-company').value.trim();
+        var chemical = document.getElementById('inq-chemical').value;
+        var qty = document.getElementById('inq-qty').value.trim();
+        var price = document.getElementById('inq-price').value.trim();
+        var delivType = document.querySelector('input[name="delivery-type"]:checked');
+        var location = document.getElementById('inq-location').value.trim();
+        var remarks = document.getElementById('inq-remarks').value.trim();
+
+        /* Validation */
+        if (!name || !phone || !email || !company || !chemical || !qty || !price || !delivType) {
+          window.showToast('Please fill in all required fields.', 'error');
+          return;
+        }
+        if (delivType.value === 'Delivered' && !location) {
+          window.showToast('Please enter the delivery location.', 'error');
+          return;
+        }
+
+        /* Show loading state */
+        var btnText = document.getElementById('inq-btn-text');
+        var btnSpinner = document.getElementById('inq-btn-spinner');
+        var submitBtn = document.getElementById('inq-submit');
+        btnText.style.display = 'none';
+        btnSpinner.style.display = 'inline';
+        submitBtn.disabled = true;
+
+        /* Build message body */
+        var msgBody = [
+          '&#x1F9EA; NEW CHEMICAL SUPPLY INQUIRY — PIPE CHEM',
+          '',
+          'Name: ' + name,
+          'Phone: ' + phone,
+          'Email: ' + email,
+          'Company: ' + company,
+          '',
+          'Chemical: ' + chemical,
+          'Quantity: ' + qty + ' MT',
+          'Exp. Price: ₹' + price + '/MT',
+          'Delivery: ' + delivType.value + (delivType.value === 'Delivered' ? ' — ' + location : ''),
+          '',
+          'Remarks: ' + (remarks || 'None'),
+          '',
+          'Submitted: ' + new Date().toLocaleString('en-IN')
+        ].join('\n');
+
+        /* Also save locally as backup */
+        var inquiries = window.PC.getInquiries();
+        inquiries.push({
+          id: window.PC.generateId(),
+          name: name, phone: phone, email: email, company: company,
+          chemical: chemical, quantity: qty + ' MT', expectedPrice: '₹' + price + '/MT',
+          deliveryType: delivType.value,
+          location: location || 'Ex-Plant (Self Arranged)',
+          remarks: remarks, status: 'Pending',
+          createdAt: new Date().toISOString()
+        });
+        window.PC.saveInquiries(inquiries);
+
+        /* Send email via Web3Forms */
+        var payload = {
+          access_key: WEB3FORMS_KEY,
+          subject: '&#x1F9EA; New Inquiry: ' + chemical + ' from ' + company,
+          from_name: 'PIPE CHEM Website',
+          replyto: email,
+          name: name,
+          email: email,
+          message: msgBody,
+          /* Extra named fields shown neatly in email */
+          'Company': company,
+          'Phone': phone,
+          'Chemical': chemical,
+          'Quantity (MT)': qty,
+          'Expected Price (INR/MT)': price,
+          'Delivery Type': delivType.value,
+          'Delivery Location': location || 'Ex-Plant',
+          'Remarks': remarks || 'None'
+        };
+
+        fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            submitBtn.disabled = false;
+            if (data.success) {
+              /* Show success state */
+              form.style.display = 'none';
+              document.querySelector('.inquiry-form-card h2').style.display = 'none';
+              document.querySelector('.inquiry-form-card .sub').style.display = 'none';
+              document.getElementById('inq-success-msg').style.display = 'block';
+            } else {
+              btnText.style.display = 'inline';
+              btnSpinner.style.display = 'none';
+              window.showToast('Submission failed. Please call us directly at +91 9558821244.', 'error');
+            }
+          })
+          .catch(function () {
+            submitBtn.disabled = false;
+            btnText.style.display = 'inline';
+            btnSpinner.style.display = 'none';
+            window.showToast('Network error. Please call us at +91 9558821244.', 'error');
+          });
+      });
+
+      /* ── Reset form after success ── */
+      window.resetInquiryForm = function () {
+        form.reset();
+        form.style.display = '';
+        document.querySelector('.inquiry-form-card h2').style.display = '';
+        document.querySelector('.inquiry-form-card .sub').style.display = '';
+        document.getElementById('inq-success-msg').style.display = 'none';
+        document.getElementById('inq-btn-text').style.display = 'inline';
+        document.getElementById('inq-btn-spinner').style.display = 'none';
+        document.getElementById('inq-submit').disabled = false;
+        locationField.classList.remove('show');
+      };
+
+    }());
+  </script>
+</body>
+
+</html>
